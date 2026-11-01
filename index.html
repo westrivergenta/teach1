@@ -1,0 +1,2309 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#ffe3ec">
+<title>まなびランド ― がくねんをえらんであそぼう！</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1:#fff6d9; --bg2:#ffe3ec;
+    --ink:#3b2f4a; --sub:#7a6c8a;
+    --card:#ffffff;
+    --pink:#ff7aa8; --orange:#ffa94d; --yellow:#ffd43b; --green:#51cf66; --blue:#4dabf7; --purple:#9775fa;
+    --ok:#2fb35a; --ng:#f2545b;
+    --radius:22px;
+    --maruo-card-bg:#ffffff; --maruo-ink:#3b2f4a; --maruo-accent:#ff7aa8; --maruo-accent2:#ffa94d; --maruo-accent3:#4dabf7;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+  body{
+    font-family:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Meiryo",sans-serif;
+    color:var(--ink);
+    background:linear-gradient(160deg,var(--bg1),var(--bg2));
+    background-attachment:fixed;
+    min-height:100%;
+    overflow-x:hidden;
+    touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+  }
+  .bg-dots{position:fixed;inset:0;pointer-events:none;opacity:.35;
+    background-image:radial-gradient(#ffffff 2.5px,transparent 3px);background-size:34px 34px}
+  #app{position:relative;max-width:480px;margin:0 auto;height:100vh;height:100dvh;display:flex;flex-direction:column;
+    padding:calc(env(safe-area-inset-top) + 10px) 14px calc(env(safe-area-inset-bottom) + 10px)}
+  @media (min-width:600px) and (min-height:640px){
+    body{display:flex;align-items:center;justify-content:center}
+    #app{height:min(calc(100dvh - 40px),880px);width:430px;border-radius:40px;border:10px solid #3b2f4a;
+      background:linear-gradient(160deg,var(--bg1),var(--bg2));box-shadow:0 20px 50px rgba(59,47,74,.25);overflow:hidden}
+  }
+  .screen{display:none;flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;animation:pop .3s ease;padding-bottom:10px}
+  .screen.active{display:block}
+  #s-play.active{display:flex;flex-direction:column;overflow:hidden;padding-bottom:0}
+  @keyframes pop{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+
+  header.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .iconbtn{border:none;background:#fff;border-radius:999px;padding:8px 14px;font:inherit;font-weight:800;
+    color:var(--ink);box-shadow:0 3px 0 rgba(0,0,0,.08);cursor:pointer;font-size:15px}
+  .iconbtn:active{transform:translateY(2px);box-shadow:none}
+
+  h1.logo{font-size:clamp(34px,8vw,54px);margin:6px 0 0;text-align:center;letter-spacing:.04em;line-height:1.1}
+  h1.logo span{display:inline-block;animation:bob 2.4s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  .tagline{text-align:center;color:var(--sub);font-weight:800;margin:6px 0 10px}
+
+  .mascot-wrap{display:flex;align-items:flex-end;justify-content:center;gap:10px;margin:8px 0 14px}
+  .bubble{background:#fff;border-radius:18px;padding:10px 14px;font-weight:800;position:relative;
+    box-shadow:0 4px 0 rgba(0,0,0,.06);max-width:260px;font-size:16px;line-height:1.5}
+  .bubble:after{content:"";position:absolute;left:-10px;bottom:14px;border:8px solid transparent;border-right-color:#fff}
+  .mascot{width:92px;height:92px;flex:none}
+  .mascot.jump{animation:jump .5s ease}
+  .mascot.shake{animation:shake .4s ease}
+  @keyframes jump{0%,100%{transform:translateY(0)}40%{transform:translateY(-22px) rotate(-6deg)}}
+  @keyframes shake{0%,100%{transform:none}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+  .section-title{font-size:20px;font-weight:800;margin:14px 4px 10px}
+  .grid{display:grid;gap:12px}
+  .grid.g3{grid-template-columns:repeat(3,1fr)}
+  .grid.g2{grid-template-columns:repeat(2,1fr)}
+  @media (max-width:480px){.grid.g3{grid-template-columns:repeat(2,1fr)}}
+
+  .bigbtn{border:none;border-radius:var(--radius);padding:18px 10px;font:inherit;font-weight:800;color:#fff;
+    cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,.15);transition:transform .08s;position:relative;text-align:center}
+  .bigbtn:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.15)}
+  .bigbtn .num{font-size:40px;display:block;line-height:1}
+  .bigbtn .lbl{font-size:16px;display:block;margin-top:4px}
+  .bigbtn .stars{font-size:14px;display:block;margin-top:6px;letter-spacing:2px;min-height:18px}
+  .c1{background:var(--pink)} .c2{background:var(--orange)} .c3{background:#f4b400}
+  .c4{background:var(--green)} .c5{background:var(--blue)} .c6{background:var(--purple)}
+
+  .subj{padding:22px 14px;text-align:left;display:flex;gap:14px;align-items:center}
+  .subj .emo{font-size:46px;line-height:1}
+  .subj .t{font-size:22px;display:block}
+  .subj .d{font-size:13px;opacity:.95;display:block;margin-top:4px;font-weight:500}
+  .subj .best{font-size:13px;display:block;margin-top:6px}
+
+  .card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:0 6px 0 rgba(0,0,0,.06)}
+
+  /* play */
+  .hud{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .pill{background:#fff;border-radius:999px;padding:6px 14px;font-weight:800;box-shadow:0 3px 0 rgba(0,0,0,.06)}
+  .progress{display:flex;gap:3px;justify-content:center;flex-wrap:wrap;margin:6px 0 6px}
+  .progress i{width:9px;height:9px;border-radius:50%;background:#fff;display:block;transition:background .2s}
+  .progress i.ok{background:var(--ok)} .progress i.p-hint{background:var(--orange)} .progress i.ng{background:var(--ng)} .progress i.now{background:var(--yellow);transform:scale(1.3)}
+  .timerrow{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+  .chance{color:var(--ok);transition:all .2s}
+  .chance.late{color:#e8590c;background:#fff4e6;animation:jump .5s ease}
+  #s-play .hud{margin-bottom:4px}
+  #s-play .pill{padding:4px 12px;font-size:14px}
+  #s-play .iconbtn{padding:6px 12px}
+  .timer{height:12px;background:#fff;border-radius:8px;overflow:hidden;margin-bottom:8px;position:relative}
+  .timer b{display:block;height:100%;width:100%;background:var(--green);transition:width .1s linear, background .3s}
+  .timer b.late{background:var(--orange)}
+  .timer i{position:absolute;top:0;bottom:0;width:3px;background:var(--ink);opacity:.35}
+  .hint{display:none;margin-top:12px;background:#fff4e6;border:3px dashed var(--orange);border-radius:16px;padding:10px 14px;
+    font-weight:800;font-size:17px;line-height:1.6;color:#8a3b00;text-align:center}
+  .hint.show{display:block;animation:pop .35s ease}
+  .choice.gone{opacity:.25;text-decoration:line-through;box-shadow:none}
+  .stickers{grid-template-columns:repeat(6,1fr)!important;gap:6px!important}
+  .stk-h{grid-column:1/-1;font-weight:800;margin:6px 0 0}
+  .sticker{font-size:26px!important;border-radius:12px!important}
+  .modes{display:grid;gap:12px}
+  .mode .d small{display:block;opacity:.9}
+  .mixinfo{font-weight:800;line-height:1.6}
+  .mixinfo .rt{font-size:20px;margin-bottom:6px}
+  .mixrow{display:grid;grid-template-columns:1fr auto;gap:0 10px;padding:8px 0;border-bottom:2px dashed #f0e6f6}
+  .mixrow small{grid-column:1/3;color:var(--sub);font-size:13px}
+  .mixinfo .best{margin-top:8px;color:var(--pink)}
+  .startbtn{width:100%;margin-top:14px;font-size:28px;padding:20px}
+  .tag{display:inline-block;border-radius:999px;padding:2px 10px;color:#fff;font-size:13px;margin-right:4px}
+  .t-math{background:var(--orange)} .t-kanji{background:var(--blue)} .t-read{background:var(--green)}
+  .t-seikatsu{background:var(--pink)} .t-rika{background:#15aabf} .t-shakai{background:#e8a200} .t-eigo{background:#7950f2}
+  .c7{background:#7950f2}
+  .emo-big{font-size:clamp(48px,14vw,70px);line-height:1.1}
+  .en-big{font-size:clamp(34px,10vw,48px);font-family:"Arial Rounded MT Bold","Helvetica Neue",Arial,sans-serif;letter-spacing:.02em}
+  .en-sent{font-family:"Arial Rounded MT Bold","Helvetica Neue",Arial,sans-serif;font-size:clamp(20px,5.5vw,26px);line-height:1.5}
+  .en-sent small{font-family:"M PLUS Rounded 1c",sans-serif;font-size:.65em;color:var(--sub)}
+  .kana-q{font-size:.55em;color:var(--sub)}
+  .choice{flex-direction:column}
+  .choice .kana{display:block;font-size:.5em;color:var(--sub);margin-top:2px}
+  .choice.ok .kana,.choice.ng .kana{color:#fff}
+  .qbox.read{text-align:left;align-items:stretch}
+  .qbox.read .qlabel{text-align:center}
+  .passage{background:#fffbea;border-radius:14px;padding:10px 14px;font-size:clamp(16px,4.3vw,20px);line-height:1.8;font-weight:500;text-align:left}
+  .rq{margin:2px 0 8px;font-size:clamp(16px,4.5vw,21px);line-height:1.6;text-align:left}
+  .rq:before{content:"Q. ";color:var(--pink)}
+  .choices.list{grid-template-columns:1fr}
+  .choices.list{gap:7px}
+  .choices.list .choice{font-size:clamp(15px,4.2vw,19px);min-height:46px;padding:8px 14px;box-shadow:0 4px 0 #e6dcef;justify-content:flex-start;text-align:left;line-height:1.5}
+  .breakdown.subj{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .breakdown.subj span{font-size:13px;padding:4px 8px}
+  .breakdown.subj b{font-size:18px}
+  .rules{margin-top:16px;font-weight:800;line-height:1.9;font-size:15px}
+  .rules .rt{font-size:16px;margin-bottom:4px}
+  .rules .rs{color:var(--pink);margin-top:4px}
+  .breakdown{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:8px 0}
+  .breakdown span{background:#fff;border-radius:14px;padding:6px 12px;box-shadow:0 3px 0 rgba(0,0,0,.06)}
+  .breakdown b{font-size:22px;margin:0 3px 0 6px}
+  .breakdown small{font-size:11px}
+  .b4{color:var(--ok)} .b3{color:#e8590c} .b0{color:var(--ng)}
+  .qbox{text-align:center;padding:12px 12px;flex:1 1 auto;min-height:0;overflow-y:auto;display:flex;flex-direction:column;justify-content:safe center;align-items:center;gap:8px}
+  .poco-row{display:flex;align-items:center;gap:8px;margin:6px 0 4px;min-height:58px}
+  .poco-row .mascot{width:54px;height:54px;flex:none}
+  .poco-say{flex:1;background:#fff;border-radius:16px;padding:6px 12px;font-weight:800;font-size:14px;line-height:1.45;position:relative;
+    box-shadow:0 3px 0 rgba(0,0,0,.06);transition:background .2s}
+  .poco-say:before{content:"";position:absolute;left:-12px;top:50%;margin-top:-8px;border:8px solid transparent;border-right-color:inherit}
+  .poco-say{border-color:#fff}
+  .poco-say.k-hint{background:#fff4e6;border-color:#fff4e6;color:#8a3b00;animation:pop .35s ease}
+  .poco-say.k-ok{background:#ebfbee;border-color:#ebfbee;color:#1f8a43}
+  .poco-say.k-ng{background:#fff0f0;border-color:#fff0f0;color:#b8343a}
+  .poco-say .who{font-size:12px;opacity:.7;display:block}
+  .qlabel{font-size:13px;color:var(--sub);font-weight:800}
+  .qtext{font-size:clamp(28px,7vw,44px);font-weight:800;line-height:1.35}
+  .qtext.small{font-size:clamp(19px,4.6vw,25px);line-height:1.6}
+  .kanji{font-size:clamp(48px,13vw,80px);letter-spacing:.06em;line-height:1.2}
+  .kanji small{font-size:.45em;letter-spacing:0}
+  .choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;padding-bottom:4px}
+  .choice{border:none;background:#fff;border-radius:18px;padding:18px 8px;font:inherit;font-weight:800;
+    font-size:clamp(22px,6vw,28px);color:var(--ink);cursor:pointer;box-shadow:0 6px 0 #e6dcef;min-height:68px;
+    display:flex;align-items:center;justify-content:center;transition:transform .08s, background .2s}
+  .choice:active{transform:translateY(4px);box-shadow:0 2px 0 #e6dcef}
+  .choice.ok{background:var(--ok);color:#fff;box-shadow:0 6px 0 #1f8a43}
+  .choice.ng{background:var(--ng);color:#fff;box-shadow:0 6px 0 #b8343a}
+  .choice[disabled]{cursor:default}
+  .frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;line-height:1;margin:0 .1em;font-size:.85em}
+  .frac span:first-child{border-bottom:3px solid currentColor;padding:0 .15em .08em}
+  .frac span:last-child{padding-top:.08em}
+  .feedback{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%) scale(.5);font-size:120px;font-weight:800;
+    pointer-events:none;opacity:0;z-index:20;text-shadow:0 6px 0 rgba(0,0,0,.08)}
+  .feedback.show{animation:fb .7s ease forwards}
+  @keyframes fb{0%{opacity:0;transform:translate(-50%,-50%) scale(.4)}30%{opacity:1;transform:translate(-50%,-50%) scale(1.1)}80%{opacity:1}100%{opacity:0;transform:translate(-50%,-60%) scale(1)}}
+  .combo{color:var(--orange);font-weight:800;min-height:24px;text-align:center;font-size:18px}
+  .explain{margin-top:12px;text-align:center;font-weight:800;color:var(--sub);min-height:24px;font-size:16px}
+
+  /* result */
+  .result-stars{font-size:64px;text-align:center;letter-spacing:6px;margin:6px 0}
+  .result-stars span{display:inline-block;opacity:.2;transform:scale(.6);transition:all .4s}
+  .result-stars span.on{opacity:1;transform:scale(1)}
+  .score-big{text-align:center;font-size:44px;font-weight:800}
+  .score-sub{text-align:center;color:var(--sub);font-weight:800}
+  .review{margin-top:14px;display:grid;gap:8px}
+  .review div{background:#fff8fb;border-radius:12px;padding:8px 12px;font-weight:800;font-size:15px}
+  .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+  .btn{border:none;border-radius:999px;padding:14px 22px;font:inherit;font-weight:800;font-size:18px;cursor:pointer;
+    color:#fff;background:var(--pink);box-shadow:0 5px 0 #d6577f}
+  .btn.alt{background:var(--blue);box-shadow:0 5px 0 #2f86c9}
+  .btn.ghost{background:#fff;color:var(--ink);box-shadow:0 5px 0 #e6dcef}
+  .btn:active{transform:translateY(3px);box-shadow:none}
+
+  /* sticker book */
+  .stickers{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+  @media (max-width:480px){.stickers{grid-template-columns:repeat(4,1fr)}}
+  .sticker{aspect-ratio:1;border-radius:16px;background:#f3eef8;display:flex;align-items:center;justify-content:center;
+    font-size:32px;position:relative}
+  .sticker.locked{filter:grayscale(1);opacity:.35}
+  .sticker small{position:absolute;bottom:3px;font-size:10px;font-weight:800;color:var(--sub)}
+  .recent{margin-top:6px;font-size:14px}
+  .rank-box{display:none;background:#fff8e1;border-radius:16px;padding:10px 14px;margin-top:12px;font-weight:800;font-size:14px;line-height:1.6;text-align:center}
+  .rank-box.show{display:block}
+  .rank-box .st{font-size:12px;color:var(--sub)}
+  .rank-chips{display:none;margin-top:14px}
+  .rank-chips.show{display:block}
+  .rank-chips .chips{margin-top:6px}
+  .rk-list{max-height:55vh;overflow-y:auto;margin:8px 0;text-align:left}
+  .rk-row{display:grid;grid-template-columns:34px 1fr auto;gap:6px;align-items:center;padding:7px 8px;border-radius:12px;font-size:14px}
+  .rk-row:nth-child(odd){background:#faf6fd}
+  .rk-row.me{background:#ffe3ec}
+  .rk-row .no{font-size:16px;text-align:center}
+  .rk-row .sc{text-align:right} .rk-row .sc small{display:block;font-size:11px;color:var(--sub)}
+  .hbtns{display:flex;gap:8px}
+  .setbtn{display:block;width:100%;border:none;border-radius:18px;padding:16px;margin-top:12px;font:inherit;font-weight:800;font-size:17px;
+    background:#fff;color:var(--ink);box-shadow:0 5px 0 #e6dcef;cursor:pointer;text-align:left}
+  .setbtn:active{transform:translateY(3px);box-shadow:none}
+  .setbtn.danger{color:#c92a2a;background:#fff5f5;box-shadow:0 5px 0 #ffc9c9}
+  .badge{background:var(--pink);color:#fff;border-radius:999px;padding:1px 9px;font-size:13px;margin-left:4px}
+  .stat-total{display:flex;gap:8px;margin:6px 0 10px}
+  .stat-total div{flex:1;background:#fff8fb;border-radius:14px;padding:8px;text-align:center;font-weight:800;font-size:13px;color:var(--sub)}
+  .stat-total b{display:block;font-size:24px;color:var(--ink)}
+  .stat-row{display:grid;grid-template-columns:1fr auto;gap:2px 8px;padding:8px 0;border-top:2px dashed #f0e6f6;font-weight:800;font-size:14px}
+  .stat-row small{grid-column:1/3;color:var(--sub);font-size:12px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+  .chip{border:none;border-radius:999px;padding:6px 12px;font:inherit;font-weight:800;font-size:14px;background:#fff;color:var(--ink);box-shadow:0 3px 0 #e6dcef;cursor:pointer}
+  .chip.on{background:var(--pink);color:#fff;box-shadow:0 3px 0 #d6577f}
+  .hist{background:#fff;border-radius:16px;padding:10px 14px;margin-bottom:8px;box-shadow:0 3px 0 rgba(0,0,0,.05);font-weight:800}
+  .hist .hh{font-size:12px;color:var(--sub);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .hist .hh .tag{font-size:11px}
+  .hist .hq{font-size:16px;margin:4px 0;line-height:1.5}
+  .hist .ha{font-size:14px;color:var(--ok)} .hist .hp{font-size:13px;color:var(--ng)}
+  .empty{text-align:center;color:var(--sub);font-weight:800;padding:30px 10px}
+  .modal{position:fixed;inset:0;background:rgba(59,47,74,.45);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+  .modal.show{display:flex}
+  .modal-card{background:#fff;border-radius:22px;padding:20px;max-width:360px;width:100%;font-weight:800;line-height:1.7;text-align:center;animation:pop .25s ease}
+  .danger-btn{background:#fa5252;box-shadow:0 5px 0 #c92a2a}
+  .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 30px);transform:translateX(-50%);background:var(--ink);color:#fff;
+    padding:10px 18px;border-radius:999px;font-weight:800;opacity:0;transition:opacity .3s;z-index:60;pointer-events:none}
+  .toast.show{opacity:1}
+  .newsticker{text-align:center;margin-top:10px;font-weight:800;font-size:18px}
+  .newsticker .big{font-size:70px;display:block;animation:jump .7s ease 2}
+
+  .confetti{position:fixed;top:-20px;width:10px;height:14px;z-index:30;pointer-events:none;border-radius:2px;animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+  .muted{color:var(--sub);font-size:13px;text-align:center;margin-top:20px}
+</style>
+</head>
+<body>
+<div class="bg-dots"></div>
+<div id="app">
+
+  <!-- TITLE / GRADE SELECT -->
+  <section class="screen active" id="s-title">
+    <header class="top">
+      <button class="iconbtn" id="btn-book">📒 シールちょう</button>
+      <span class="hbtns"><button class="iconbtn sound-toggle">🔊 おと</button><button class="iconbtn" data-go="settings" aria-label="せってい">⚙️</button></span>
+    </header>
+    <h1 class="logo"><span style="color:var(--pink)">ま</span><span style="color:var(--orange);animation-delay:.15s">な</span><span style="color:#f4b400;animation-delay:.3s">び</span><span style="color:var(--green);animation-delay:.45s">ラ</span><span style="color:var(--blue);animation-delay:.6s">ン</span><span style="color:var(--purple);animation-delay:.75s">ド</span></h1>
+    <p class="tagline">もんだいをといて シールをあつめよう！</p>
+    <div class="mascot-wrap">
+      <div class="mascot-slot"></div>
+      <div class="bubble">ぼく、ポコ！<br>なんねんせいかな？</div>
+    </div>
+    <div class="section-title">🎒 がくねんを えらんでね</div>
+    <div class="grid g3" id="grade-grid"></div>
+  </section>
+
+  <!-- SUBJECT SELECT -->
+  <section class="screen" id="s-subject">
+    <header class="top">
+      <button class="iconbtn" data-go="title">← もどる</button>
+      <button class="iconbtn sound-toggle">🔊 おと</button>
+    </header>
+    <div class="mascot-wrap">
+      <div class="mascot-slot"></div>
+      <div class="bubble" id="subject-bubble"></div>
+    </div>
+    
+    <div class="section-title" data-k="📚 きょうかを えらんでね">📚 きょうかを えらんでね</div>
+    <div class="modes" id="subject-grid"></div>
+    <div class="rank-chips" id="rank-chips"><div class="section-title" style="margin:0">🏆 ランキング</div><div class="chips" id="rank-chip-list"></div></div>
+    <div class="rank-box" id="rank-box-sub"></div>
+    <div class="card rules">
+      <div class="rt" data-k="📏 ルール（1かい 25もん・100てん まんてん）">📏 ルール（1かい 25もん・100てん まんてん）</div>
+      <div data-k="⭐ はやく せいかい（ヒントの まえ）… <b>4てん</b>">⭐ はやく せいかい（ヒントの まえ）… <b>4てん</b></div>
+      <div data-k="💡 ヒントが でたあと せいかい … <b>3てん</b>">💡 ヒントが でたあと せいかい … <b>3てん</b></div>
+      <div data-k="❌ まちがい・じかんぎれ … <b>0てん</b>">❌ まちがい・じかんぎれ … <b>0てん</b></div>
+      <div class="rs" data-k="90てん いじょうで ⭐3つ＆シール ゲット！">90てん いじょうで ⭐3つ＆シール ゲット！</div>
+    </div>
+  </section>
+
+  <!-- PLAY -->
+  <section class="screen" id="s-play">
+    <div class="hud">
+      <button class="iconbtn" id="btn-quit">✕</button>
+      <span class="pill" id="hud-info"></span>
+      <span class="pill">🪙 <b id="hud-score">0</b></span>
+    </div>
+    <div class="progress" id="progress"></div>
+    <div class="timerrow">
+      <span class="pill chance" id="chance">⭐ 4てん チャンス</span>
+      <span class="pill">⏱ <b id="timesec">0</b><span data-k="びょう">びょう</span></span>
+    </div>
+    <div class="timer"><b id="timerbar"></b><i id="ideal-mark"></i></div>
+    <div class="card qbox">
+      <div class="qlabel" id="qlabel"></div>
+      <div class="qtext" id="qtext"></div>
+    </div>
+    <div class="poco-row">
+      <div class="mascot-slot"></div>
+      <div class="poco-say" id="poco-say"></div>
+    </div>
+    <div class="choices" id="choices"></div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" id="s-result">
+    <div class="card">
+      <div class="mascot-wrap" style="margin-top:0">
+        <div class="mascot-slot"></div>
+        <div class="bubble" id="result-bubble"></div>
+      </div>
+      <div class="result-stars" id="result-stars"><span>⭐</span><span>⭐</span><span>⭐</span></div>
+      <div class="score-big" id="result-score"></div>
+      <div class="score-sub" id="result-sub"></div>
+      <div id="result-sticker"></div>
+      <div class="rank-box" id="rank-box-res"></div>
+      <div class="review" id="review"></div>
+      <div class="row">
+        <button class="btn" id="btn-again" data-k="🔁 もういちど">🔁 もういちど</button>
+        <button class="btn alt rank-only" id="btn-rank-res" style="display:none">🏆 ランキング</button>
+        <button class="btn alt" data-go="subject" data-k="📚 きょうかを かえる">📚 きょうかを かえる</button>
+        <button class="btn ghost" data-go="title" data-k="🎒 がくねんを かえる">🎒 がくねんを かえる</button>
+        
+      </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="screen" id="s-settings">
+    <header class="top">
+      <button class="iconbtn" data-go="title">← もどる</button>
+      <button class="iconbtn sound-toggle">🔊 おと</button>
+    </header>
+    <div class="section-title">⚙️ せってい</div>
+    <div class="card">
+      <div class="rt">📊 きろく</div>
+      <div id="stats-body"></div>
+    </div>
+    <button class="setbtn" id="btn-history">📝 まちがえた もんだいの りれき <span class="badge" id="hist-count"></span></button>
+    <button class="setbtn danger" id="btn-reset">🗑️ ほし・シール・きろくを リセット</button>
+    <p class="muted">リセットすると、ほし・シール・ベスト・プレイかいすう・へいきんてん・まちがえた りれきが すべて きえます。<br>（ランキングの じこベストは きえません）</p>
+  </section>
+
+  <!-- HISTORY -->
+  <section class="screen" id="s-history">
+    <header class="top">
+      <button class="iconbtn" data-go="settings">← もどる</button>
+      <span class="pill" id="hist-total"></span>
+    </header>
+    <div class="section-title">📝 まちがえた もんだい</div>
+    <div class="chips" id="hist-filter"></div>
+    <div id="hist-list"></div>
+  </section>
+
+  <!-- STICKER BOOK -->
+  <section class="screen" id="s-book">
+    <header class="top">
+      <button class="iconbtn" data-go="title">← もどる</button>
+      <span class="pill" id="book-count"></span>
+    </header>
+    <div class="section-title">📒 シールちょう</div>
+    <div class="card"><div class="stickers" id="stickers"></div></div>
+    <p class="muted">がくねん・きょうかごとに 90てん いじょう（⭐3つ）を とると シールが もらえるよ。</p>
+  </section>
+
+</div>
+<div class="feedback" id="feedback"></div>
+<div class="modal" id="modal"><div class="modal-card">
+  <div class="modal-msg" id="modal-msg"></div>
+  <div class="row"><button class="btn danger-btn" id="modal-ok">けす</button><button class="btn ghost" id="modal-cancel">やめる</button></div>
+</div></div>
+<div class="toast" id="toast"></div>
+<div class="modal" id="rank-modal"><div class="modal-card">
+  <div style="font-size:18px">🏆 <span id="rk-title"></span></div>
+  <div class="st" id="rk-note" style="font-size:12px;color:var(--sub)"></div>
+  <div class="rk-list" id="rk-list"></div>
+  <div class="row" style="margin-top:8px"><button class="btn ghost" id="rk-kit">なまえ・くわしく</button><button class="btn" id="rk-close">とじる</button></div>
+</div></div>
+
+<script src="config.js"></script>
+<script src="maruo-opening.js"></script>
+<script src="maruo-ranking.js"></script>
+<script>
+/* ========= ユーティリティ ========= */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const rnd = (a,b) => Math.floor(Math.random()*(b-a+1))+a;
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+const shuffle = arr => { const a=arr.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const gcd = (a,b) => b ? gcd(b, a%b) : Math.abs(a);
+const round = (x,d=2) => Math.round(x*Math.pow(10,d))/Math.pow(10,d);
+const fmt = x => String(round(x,3));
+
+const store = {
+  get(k,def){ try{ const v = localStorage.getItem('manabi_'+k); return v==null?def:JSON.parse(v);}catch(e){return def;} },
+  set(k,v){ try{ localStorage.setItem('manabi_'+k, JSON.stringify(v)); }catch(e){} }
+};
+let mem = { best: store.get('best_v3',{}), stickers: store.get('stickers_v3',{}), stats: store.get('stats_v1',{}), hist: store.get('hist_v1',[]) };
+
+/* ========= マスコット（オリジナルキャラ「ポコ」） ========= */
+const mascotSVG = (mood='happy') => {
+  const mouth = mood==='sad'
+    ? '<path d="M38 66 Q50 58 62 66" stroke="#3b2f4a" stroke-width="4" fill="none" stroke-linecap="round"/>'
+    : '<path d="M36 60 Q50 74 64 60" stroke="#3b2f4a" stroke-width="4" fill="#ff7aa8" stroke-linecap="round"/>';
+  const eyes = mood==='great'
+    ? '<path d="M30 46 Q36 38 42 46" stroke="#3b2f4a" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M58 46 Q64 38 70 46" stroke="#3b2f4a" stroke-width="4" fill="none" stroke-linecap="round"/>'
+    : '<circle cx="36" cy="45" r="6" fill="#3b2f4a"/><circle cx="64" cy="45" r="6" fill="#3b2f4a"/><circle cx="38" cy="43" r="2" fill="#fff"/><circle cx="66" cy="43" r="2" fill="#fff"/>';
+  return `<svg class="mascot" viewBox="0 0 100 100" aria-hidden="true">
+    <ellipse cx="50" cy="94" rx="28" ry="4" fill="rgba(0,0,0,.08)"/>
+    <path d="M24 30 L18 8 L38 22 Z" fill="#ffa94d"/><path d="M76 30 L82 8 L62 22 Z" fill="#ffa94d"/>
+    <circle cx="50" cy="54" r="38" fill="#ffd43b"/>
+    <ellipse cx="50" cy="66" rx="24" ry="18" fill="#fff3bf"/>
+    ${eyes}
+    <circle cx="24" cy="58" r="6" fill="#ffb3c7" opacity=".8"/><circle cx="76" cy="58" r="6" fill="#ffb3c7" opacity=".8"/>
+    ${mouth}
+  </svg>`;
+};
+function setMascot(mood, anim){
+  $$('.mascot-slot').forEach(s => s.innerHTML = mascotSVG(mood));
+  if(anim){ $$('.mascot').forEach(m => { m.classList.remove('jump','shake'); void m.offsetWidth; m.classList.add(anim); }); }
+}
+
+/* ========= おと ========= */
+let soundOn = store.get('sound', true);
+let actx = null;
+function beep(freqs, dur=0.12, type='sine', gap=0.09){
+  if(!soundOn) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    freqs.forEach((f,i)=>{
+      const o = actx.createOscillator(), g = actx.createGain();
+      o.type = type; o.frequency.value = f;
+      const t = actx.currentTime + i*gap;
+      g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.18,t+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+      o.connect(g).connect(actx.destination); o.start(t); o.stop(t+dur+0.02);
+    });
+  }catch(e){}
+}
+const sfx = {
+  ok: ()=>beep([784,1047],0.15,'triangle'),
+  ng: ()=>beep([330,262],0.18,'square',0.12),
+  click: ()=>beep([660],0.06,'triangle'),
+  fanfare: ()=>beep([523,659,784,1047,784,1047],0.18,'triangle',0.12)
+};
+function refreshSoundBtns(){ $$('.sound-toggle').forEach(b=> b.textContent = soundOn ? '🔊 おと' : '🔇 おと'); }
+$$('.sound-toggle').forEach(b=> b.addEventListener('click', ()=>{ soundOn=!soundOn; store.set('sound',soundOn); refreshSoundBtns(); sfx.click(); }));
+
+/* ========= 表示ヘルパー ========= */
+const F = (n,d) => {            // 分数HTML（帯分数は使わず、整数になれば整数）
+  const g = gcd(n,d); n/=g; d/=g;
+  if(d===1) return String(n);
+  return `<span class="frac"><span>${n}</span><span>${d}</span></span>`;
+};
+const fkey = (n,d) => { const g=gcd(n,d); return (n/g)+'/'+(d/g); };
+
+// 数の答えから4択をつくる
+function numChoices(ans, opts={}){
+  const {spread=5, dec=0, min=0, extra=[]} = opts;
+  const set = new Set([fmt(ans)]);
+  const cands = extra.filter(x=>x!==ans && x>=min).map(fmt);
+  shuffle(cands).forEach(c=>{ if(set.size<4) set.add(c); });
+  let guard=0;
+  while(set.size<4 && guard++<200){
+    let delta = rnd(1,spread) * (dec ? Math.pow(10,-dec) : 1) * (Math.random()<.5?-1:1);
+    const v = round(ans+delta, dec||0);
+    if(v>=min) set.add(fmt(v));
+  }
+  return shuffle([...set]).map(v=>({html:v, key:v}));
+}
+function mk(q, ansKey, choices, label, explain, small=false, hint=''){
+  return {q, ans:String(ansKey), choices, label, explain, small, hint};
+}
+const FR = (n,d) => `<span class="frac"><span>${n}</span><span>${d}</span></span>`; // 約分しない分数
+const unit = (cs,u) => cs.map(c=>({html:c.html+`<small style="font-size:.55em">${u}</small>`,key:c.key+u}));
+
+/* ========= さんすう：学年別もんだい生成（ヒントつき） ========= */
+const MATH = {
+  1: [
+    ()=>{ const a=rnd(1,9), b=rnd(1,9); const s=a+b; return mk(`${a} + ${b} = ?`, s, numChoices(s,{spread:3}), 'たしざん', `${a} + ${b} = ${s}`, false,
+      a+b>10 ? `${a} に あと ${10-a} で 10。のこりは ${b-(10-a)}` : `${a} から ${b}こ かぞえて すすもう`); },
+    ()=>{ const a=rnd(5,18), b=rnd(1,Math.min(9,a)); const s=a-b; return mk(`${a} − ${b} = ?`, s, numChoices(s,{spread:3}), 'ひきざん', `${a} − ${b} = ${s}`, false,
+      `${a} から ${b}こ もどって かぞえよう`); },
+    ()=>{ const a=rnd(1,9); return mk(`10 は ${a} と <b>?</b>`, 10-a, numChoices(10-a,{spread:3,min:1}), 'いくつと いくつ', `${a} と ${10-a} で 10`, true,
+      `${a} に いくつ たすと 10 に なるかな？ ゆびで かぞえてみよう`); },
+    ()=>{ const n=rnd(3,12); const e=pick(['🍎','🐟','🌼','🚗','⭐','🍙']); return mk(`<div style="font-size:.9em;line-height:1.3">${e.repeat(n)}</div><div style="font-size:.6em">いくつ ある？</div>`, n, numChoices(n,{spread:2,min:1}), 'かぞえよう', `ぜんぶで ${n}こ`, true,
+      `5こずつ まとめて かぞえてみよう`); }
+  ],
+  2: [
+    ()=>{ const a=rnd(12,68), b=rnd(11,99-a); const s=a+b; return mk(`${a} + ${b} = ?`, s, numChoices(s,{spread:10,extra:[s+10,s-10,s+1,s-1]}), 'たしざん', `${a} + ${b} = ${s}`, false,
+      `一のくらい（${a%10}+${b%10}）から たそう。10を こえたら くりあげ！`); },
+    ()=>{ const a=rnd(30,99), b=rnd(11,a-5); const s=a-b; return mk(`${a} − ${b} = ?`, s, numChoices(s,{spread:10,extra:[s+10,s-10]}), 'ひきざん', `${a} − ${b} = ${s}`, false,
+      `一のくらいから ひこう。ひけない ときは 十のくらいから 1 かりてくる`); },
+    ()=>{ const a=rnd(2,9), b=rnd(1,9); const s=a*b; return mk(`${a} × ${b} = ?`, s, numChoices(s,{extra:[a*(b+1),a*(b-1),(a+1)*b,(a-1)*b]}), 'かけざん（九九）', `${a}の だん：${a} × ${b} = ${s}`, false,
+      b>1 ? `${a} × ${b-1} = ${a*(b-1)}。それに ${a} を たすと？` : `${a} × 1 は ${a} が 1つ ぶん`); },
+    ()=>{ const cm=rnd(1,9), mm=rnd(1,9); const s=cm*10+mm; return mk(`${cm}cm${mm}mm は なんmm？`, s, numChoices(s,{extra:[cm+mm, cm*100+mm, s+10, s-10]}), 'ながさ', `1cm = 10mm だから ${s}mm`, true,
+      `1cm は 10mm。${cm}cm は ${cm*10}mm だよ`); }
+  ],
+  3: [
+    ()=>{ const a=rnd(120,580), b=rnd(110,419); const s=a+b; return mk(`${a} + ${b} = ?`, s, numChoices(s,{spread:20,extra:[s+100,s-100,s+10,s-10]}), 'たし算', `${a} + ${b} = ${s}`, false,
+      `一の位 → 十の位 → 百の位 の じゅんに たそう`); },
+    ()=>{ const a=rnd(300,900), b=rnd(105,a-50); const s=a-b; return mk(`${a} − ${b} = ?`, s, numChoices(s,{spread:20,extra:[s+100,s-100,s+10,s-10]}), 'ひき算', `${a} − ${b} = ${s}`, false,
+      `一の位から ひこう。ひけない ときは となりから 1 かりる`); },
+    ()=>{ const a=rnd(12,49), b=rnd(2,9); const s=a*b; const t=a-a%10; return mk(`${a} × ${b} = ?`, s, numChoices(s,{spread:10,extra:[s+b,s-b,s+10]}), 'かけ算', `${a} × ${b} = ${s}`, false,
+      a%10 ? `${t}×${b}=${t*b} と ${a%10}×${b}=${(a%10)*b} を たそう` : `${a/10}×${b} を して、0 を 1つ つけよう`); },
+    ()=>{ const b=rnd(2,9), q=rnd(2,9); const a=b*q; return mk(`${a} ÷ ${b} = ?`, q, numChoices(q,{spread:2,min:1}), 'わり算', `${b} × ${q} = ${a} だから ${q}`, false,
+      `${b} の だんで こたえが ${a} に なるのは？`); },
+    ()=>{ const b=rnd(3,9), q=rnd(2,9), r=rnd(1,b-1); const a=b*q+r;
+      const key = `${q} あまり ${r}`;
+      const set = new Set([key]);
+      shuffle([[q,r+1],[q+1,r],[q-1,r],[q,r-1],[q+1,r+1]]).forEach(([x,y])=>{ if(set.size<4 && y<b && y>0 && x>0) set.add(`${x} あまり ${y}`); });
+      while(set.size<4) set.add(`${q+rnd(1,3)} あまり ${rnd(1,b-1)}`);
+      return mk(`${a} ÷ ${b} = ?`, key, shuffle([...set]).map(v=>({html:v.replace(' あまり ','<small style="font-size:.55em">あまり</small>'),key:v})), 'あまりのある わり算', `${b} × ${q} + ${r} = ${a}`, false,
+        `${b} の だんで ${a} を こえない いちばん 大きい数は？ あまりは ${b} より 小さいよ`); }
+  ],
+  4: [
+    ()=>{ const a=rnd(12,48), b=rnd(11,39); const s=a*b; const bt=b-b%10; return mk(`${a} × ${b} = ?`, s, numChoices(s,{spread:30,extra:[s+a,s-a,s+b,s-b,s+10]}), '2けたの かけ算', `${a} × ${b} = ${s}`, false,
+      b%10 ? `${a}×${b%10}=${a*(b%10)} と ${a}×${bt}=${a*bt} を たそう` : `${a}×${b/10} を して 0 を つけよう`); },
+    ()=>{ const b=rnd(2,9), q=rnd(21,99); const a=b*q; const qt=q-q%10; return mk(`${a} ÷ ${b} = ?`, q, numChoices(q,{spread:6,extra:[q+10,q-10]}), 'わり算の ひっ算', `${b} × ${q} = ${a}`, false,
+      `${b}×${qt}=${b*qt}。のこりの ${a-b*qt} を ${b} で わると？`); },
+    ()=>{ const a=rnd(11,89)/10, b=rnd(11,89)/10; const s=round(a+b,1); return mk(`${a} + ${b} = ?`, s, numChoices(s,{spread:9,dec:1,extra:[round(s+1,1),round(s-1,1)]}), '小数の たし算', `${a} + ${b} = ${s}`, false,
+      `小数点の 位置を そろえて たそう（0.1 が ${Math.round(a*10)}こ と ${Math.round(b*10)}こ）`); },
+    ()=>{ const ai=rnd(50,99), a=ai/10, b=rnd(11,ai-5)/10; const s=round(a-b,1); return mk(`${a} − ${b} = ?`, s, numChoices(s,{spread:9,dec:1,extra:[round(s+1,1),round(s-1,1)]}), '小数の ひき算', `${a} − ${b} = ${s}`, false,
+      `小数点の 位置を そろえて ひこう（0.1 が ${ai}こ ひく ${Math.round(b*10)}こ）`); },
+    ()=>{ const w=rnd(3,15), h=rnd(2,12); const s=w*h; return mk(`たて ${h}cm、よこ ${w}cm の<br>長方形の 面積は？`, s+'cm²', unit(numChoices(s,{extra:[(w+h)*2,w+h,s+w]}),'cm²'), '面積', `${h} × ${w} = ${s}cm²`, true,
+      `長方形の 面積 ＝ たて × よこ`); }
+  ],
+  5: [
+    ()=>{ const a=rnd(11,59)/10, b=rnd(2,9); const s=round(a*b,1); return mk(`${a} × ${b} = ?`, s, numChoices(s,{spread:9,dec:1,extra:[round(s*10,1),round(s/10,2)]}), '小数の かけ算', `${a} × ${b} = ${s}`, false,
+      `${Math.round(a*10)} × ${b} を 計算して、小数点を 1けた もどそう`); },
+    ()=>{ const a=rnd(11,49)/10, b=rnd(11,29)/10; const s=round(a*b,2); return mk(`${a} × ${b} = ?`, s, numChoices(s,{spread:9,dec:2,extra:[round(s*10,1),round(s+1,2)]}), '小数 × 小数', `${a} × ${b} = ${s}`, false,
+      `${Math.round(a*10)} × ${Math.round(b*10)} を 計算して、小数点を 2けた もどそう`); },
+    ()=>{ const pairs=[[2,3],[2,5],[3,4],[3,5],[4,5],[2,7],[3,8],[4,6],[6,8],[5,10]];
+      const [d1,d2]=pick(pairs); const n1=rnd(1,d1-1), n2=rnd(1,d2-1);
+      const N=n1*d2+n2*d1, D=d1*d2; const ak=fkey(N,D);
+      const set=new Map([[ak,F(N,D)]]);
+      [[n1+n2,d1+d2],[N+d1,D],[N-1>0?N-1:N+2,D],[n1*n2,D],[N,D+d1]].forEach(([a,b])=>{ const k=fkey(a,b); if(set.size<4 && !set.has(k)) set.set(k,F(a,b)); });
+      while(set.size<4){const x=rnd(1,15);const k=fkey(x,D); if(!set.has(k)) set.set(k,F(x,D));}
+      return mk(`${F(n1,d1)} + ${F(n2,d2)} = ?`, ak, shuffle([...set].map(([k,h])=>({html:h,key:k}))), '分数の たし算', `${FR(n1*d2,D)} + ${FR(n2*d1,D)} = ${F(N,D)}`, false,
+        `分母を ${D} に そろえよう：${FR(n1*d2,D)} + ${FR(n2*d1,D)}`); },
+    ()=>{ const b=rnd(4,16), h=rnd(2,10)*2; const s=b*h/2; return mk(`底辺 ${b}cm、高さ ${h}cm の<br>三角形の 面積は？`, s+'cm²', unit(numChoices(s,{extra:[b*h,s+b,b+h]}),'cm²'), '三角形の 面積', `${b} × ${h} ÷ 2 = ${s}cm²`, true,
+      `三角形の 面積 ＝ 底辺 × 高さ ÷ 2`); },
+    ()=>{ const base=pick([200,300,400,500,600,800,1000,1200]), p=pick([10,20,25,30,40,50,60,75]); const s=base*p/100; return mk(`${base}円の ${p}% は 何円？`, s+'円', unit(numChoices(s,{spread:5,extra:[base-s,s*2,base*p/10]}),'円'), '割合', `${base} × ${p/100} = ${s}円`, true,
+      `1% は ${base/100}円。${p}% は その ${p}こ分`); }
+  ],
+  6: [
+    ()=>{ const a=rnd(1,4), b=rnd(a+1,7), c=rnd(1,5), d=rnd(c+1,9); const ak=fkey(a*c,b*d);
+      const set=new Map([[ak,F(a*c,b*d)]]);
+      [[a*d,b*c],[a+c,b+d],[a*c,b+d],[a*c+1,b*d]].forEach(([x,y])=>{const k=fkey(x,y); if(set.size<4&&!set.has(k)) set.set(k,F(x,y));});
+      while(set.size<4){const x=rnd(1,9),y=rnd(2,20);const k=fkey(x,y); if(!set.has(k)) set.set(k,F(x,y));}
+      return mk(`${F(a,b)} × ${F(c,d)} = ?`, ak, shuffle([...set].map(([k,h])=>({html:h,key:k}))), '分数の かけ算', `${FR(`${a}×${c}`,`${b}×${d}`)} = ${F(a*c,b*d)}`, false,
+        `分子は ${a}×${c}、分母は ${b}×${d}。さいごに 約分！`); },
+    ()=>{ const a=rnd(1,5), b=rnd(a+1,8), c=rnd(1,5), d=rnd(c+1,8); const ak=fkey(a*d,b*c);
+      const set=new Map([[ak,F(a*d,b*c)]]);
+      [[a*c,b*d],[b*c,a*d],[a*d+1,b*c],[a+d,b+c]].forEach(([x,y])=>{const k=fkey(x,y); if(set.size<4&&!set.has(k)) set.set(k,F(x,y));});
+      while(set.size<4){const x=rnd(1,9),y=rnd(2,20);const k=fkey(x,y); if(!set.has(k)) set.set(k,F(x,y));}
+      return mk(`${FR(a,b)} ÷ ${FR(c,d)} = ?`, ak, shuffle([...set].map(([k,h])=>({html:h,key:k}))), '分数の わり算', `${FR(a,b)} × ${FR(d,c)} = ${F(a*d,b*c)}`, false,
+        `わる数を ひっくり返して かけよう：${FR(a,b)} × ${FR(d,c)}`); },
+    ()=>{ const r=rnd(1,10); const s=round(r*r*3.14,2); return mk(`半径 ${r}cm の 円の 面積は？<br><small style="font-size:.75em">（円周率 3.14）</small>`, fmt(s)+'cm²', unit(numChoices(s,{extra:[round(r*2*3.14,2),round(r*r*2*3.14,2),round((r+1)*(r+1)*3.14,2)]}),'cm²'), '円の 面積', `${r} × ${r} × 3.14 = ${fmt(s)}cm²`, true,
+      `円の 面積 ＝ 半径 × 半径 × 3.14（${r}×${r}=${r*r}）`); },
+    ()=>{ const v=pick([4,5,40,45,50,60,80]), t=rnd(2,5); const s=v*t; return mk(`時速 ${v}km で ${t}時間 進むと<br>道のりは 何km？`, s+'km', unit(numChoices(s,{spread:5,extra:[v+t,s+v,s-v]}),'km'), '速さ', `${v} × ${t} = ${s}km`, true,
+      `道のり ＝ 速さ × 時間`); },
+    ()=>{ let a,b; do{ a=rnd(1,5); b=rnd(a+1,9); }while(gcd(a,b)!==1); const k=rnd(2,6); const key=`${a}:${b}`;
+      const set=new Set([key]); [[b,a],[a+1,b],[a,b+1],[a*k,b],[a,b*k]].forEach(([x,y])=>{ if(set.size<4) set.add(`${x}:${y}`); });
+      return mk(`${a*k} : ${b*k} を<br>かんたんな 比に すると？`, key, shuffle([...set]).map(v=>({html:v.replace(':',' : '),key:v})), '比', `両方を ${k} で わって ${a} : ${b}`, true,
+        `${a*k} と ${b*k} を 同じ数で わろう。どちらも わりきれる 数は？`); }
+  ]
+};
+
+/* ========= こくご：学年別の漢字（よみ）各学年28語以上 ========= */
+const KANJI = {
+  1:[['山','やま'],['川','かわ'],['花','はな'],['空','そら'],['雨','あめ'],['犬','いぬ'],['虫','むし'],['車','くるま'],['石','いし'],['竹','たけ'],['耳','みみ'],['森','もり'],['糸','いと'],['貝','かい'],['草','くさ'],['足','あし'],['目','め'],['口','くち'],['手','て'],['水','みず'],['田','た'],['林','はやし'],['夕日','ゆうひ'],['赤い','あかい'],['白い','しろい'],['青い','あおい'],['先生','せんせい'],['学校','がっこう'],['天気','てんき'],['町','まち'],['村','むら'],['休む','やすむ'],['見る','みる'],['王さま','おうさま']],
+  2:[['海','うみ'],['船','ふね'],['朝','あさ'],['昼','ひる'],['夜','よる'],['顔','かお'],['風','かぜ'],['魚','さかな'],['弟','おとうと'],['妹','いもうと'],['歌','うた'],['肉','にく'],['教室','きょうしつ'],['公園','こうえん'],['図書','としょ'],['電話','でんわ'],['雲','くも'],['岩','いわ'],['牛','うし'],['馬','うま'],['鳥','とり'],['麦','むぎ'],['紙','かみ'],['星','ほし'],['雪','ゆき'],['池','いけ'],['春','はる'],['夏','なつ'],['秋','あき'],['冬','ふゆ'],['算数','さんすう'],['時計','とけい'],['毎日','まいにち'],['自分','じぶん'],['汽車','きしゃ'],['門','もん']],
+  3:[['旅行','りょこう'],['坂','さか'],['島','しま'],['庭','にわ'],['湖','みずうみ'],['鉄橋','てっきょう'],['歯','は'],['皿','さら'],['箱','はこ'],['荷物','にもつ'],['笛','ふえ'],['炭','すみ'],['横','よこ'],['駅','えき'],['病院','びょういん'],['水泳','すいえい'],['葉っぱ','はっぱ'],['鼻','はな'],['畑','はたけ'],['豆','まめ'],['羊','ひつじ'],['薬','くすり'],['宿題','しゅくだい'],['温度','おんど'],['写真','しゃしん'],['緑','みどり'],['氷','こおり'],['油','あぶら'],['湯','ゆ'],['神様','かみさま'],['勉強','べんきょう']],
+  4:[['梅','うめ'],['松','まつ'],['巣','す'],['鏡','かがみ'],['旗','はた'],['塩','しお'],['灯台','とうだい'],['漁船','ぎょせん'],['街','まち'],['笑う','わらう'],['泣く','なく'],['菜の花','なのはな'],['関係','かんけい'],['協力','きょうりょく'],['自然','しぜん'],['季節','きせつ'],['冷たい','つめたい'],['便利','べんり'],['給食','きゅうしょく'],['卒業','そつぎょう'],['鹿','しか'],['熊','くま'],['孫','まご'],['健康','けんこう'],['記録','きろく'],['失敗','しっぱい'],['散歩','さんぽ'],['種','たね'],['治る','なおる'],['折る','おる']],
+  5:[['桜','さくら'],['夢','ゆめ'],['豊か','ゆたか'],['貿易','ぼうえき'],['燃える','もえる'],['快晴','かいせい'],['職業','しょくぎょう'],['銅像','どうぞう'],['領土','りょうど'],['適切','てきせつ'],['授業','じゅぎょう'],['技術','ぎじゅつ'],['喜ぶ','よろこぶ'],['枝','えだ'],['墓','はか'],['妻','つま'],['綿','わた'],['飼う','かう'],['許す','ゆるす'],['迷う','まよう'],['貯金','ちょきん'],['弁当','べんとう'],['修理','しゅうり'],['防ぐ','ふせぐ'],['増える','ふえる'],['減る','へる'],['確かめる','たしかめる'],['混ぜる','まぜる']],
+  6:[['宇宙','うちゅう'],['誕生','たんじょう'],['宝','たから'],['穴','あな'],['胸','むね'],['背中','せなか'],['郵便','ゆうびん'],['推理','すいり'],['縦','たて'],['暮らす','くらす'],['障子','しょうじ'],['貴重','きちょう'],['尊敬','そんけい'],['憲法','けんぽう'],['机','つくえ'],['砂','すな'],['窓','まど'],['骨','ほね'],['卵','たまご'],['絹','きぬ'],['蚕','かいこ'],['泉','いずみ'],['忘れる','わすれる'],['探す','さがす'],['届く','とどく'],['捨てる','すてる'],['洗う','あらう'],['暖かい','あたたかい'],['幼い','おさない'],['牛乳','ぎゅうにゅう']]
+};
+/* ---- 漢字の 読み：送り仮名を そろえた せんたくし ---- */
+// 送り仮名が 同じ 言葉を さがす ための 読みの 単語帳
+const KANA_LEX = ('たかい ながい ひくい ふるい やすい おもい ひろい せまい ふとい ほそい おそい まるい くろい あまい からい にがい いたい こわい えらい うまい あかるい くらい ' +
+ 'うれしい たのしい さびしい くやしい まぶしい すずしい おいしい めずらしい ただしい くわしい ' +
+ 'きる にる いる ねる つくる おくる すわる とまる まもる のぼる わかる かえる ふる とる うる のる ' +
+ 'かぞえる こたえる かんがえる ささえる きえる みえる うえる そなえる ' +
+ 'あう いう すう うたう あらう わらう まよう ならう つかう もらう ' +
+ 'さく ひく ふく まく おく はく いく とく かわく ' +
+ 'おす さす だす ふやす なおす かえす ゆるす ' +
+ 'まなぶ はこぶ むすぶ ころぶ さけぶ よろこぶ ' +
+ 'のむ すむ つむ かむ こむ すすむ たのむ ' +
+ 'まつ もつ かつ そだつ はなつ ' +
+ 'ぬぐ つなぐ さわぐ かぐ ' +
+ 'たしか のどか ほがらか なめらか はるか ' +
+ 'はれる ぬれる ゆれる たおれる つかれる こわれる はなれる うまれる ' +
+ 'ほめる とめる しめる きめる あつめる はじめる もとめる つとめる ' +
+ 'まげる さげる あげる にげる ' +
+ 'おりる たりる にる ' +
+ 'しらべる ならべる たべる のべる ' +
+ 'あてる たてる すてる そだてる ' +
+ 'かんじる しんじる ' +
+ 'まねる かさねる たずねる ' +
+ 'あける かける よける つける').split(' ');
+// 送り仮名が 同じ 本物の 言葉が 少ない ものは、その 漢字の ほかの 読み方などで せんたくしを 用意
+const KANJI_CHOICES = {
+  '王さま':['かみさま','おひさま','おきゃくさま'], 'お金':['おきん','おかし','おちゃ'], '名まえ':['めいまえ','みょうまえ','てまえ'],
+  '大きい':['だいきい','たいきい','おきい'], '小さい':['しょうさい','こさい','ちさい'], '子ども':['しども','すども','おども'],
+  '男の子':['だんのこ','なんのこ','おのこ'], '女の子':['じょのこ','にょのこ','めのこ'], '菜の花':['さいのはな','なのか','さいのか'],
+  '友だち':['ゆうだち','ゆだち','ほうだち'], '葉っぱ':['ようっぱ','えっぱ','ねっぱ'], '一年生':['いちとしせい','ひとねんせい','いちねんしょう'],
+  '投げる':['とうげる','まげる','さげる'], '落ちる':['らくちる','みちる','くちる'], '冷たい':['れいたい','ひたい','かたい'],
+  '借りる':['しゃくりる','おりる','たりる'], '確かめる':['かくかめる','たかめる','ふかめる'], '混ぜる':['こんぜる','かぜる','はぜる'],
+  '比べる':['ひべる','しらべる','ならべる'], '暮らす':['ぼらす','てらす','ちらす'], '捨てる':['しゃてる','あてる','たてる'],
+  '暖かい':['だんかい','あたかい','みじかい'], '異なる':['いなる','かさなる','つらなる'], '延びる':['えんびる','あびる','さびる'],
+  '危ない':['きない','すくない','おさない'], '閉じる':['へいじる','かんじる','しんじる'], '訪ねる':['ほうねる','かさねる','まねる'],
+  '預ける':['よける','あける','かける'], '静か':['せいか','じょうか','たしか'], '豊か':['ほうか','ゆか','しずか'],
+  '慣れる':['かんれる','はれる','ぬれる'], '忘れる':['ぼうれる','はなれる','つかれる'], '染める':['せんめる','ほめる','とめる'],
+  '認める':['にんめる','もとめる','つとめる']
+};
+const kSuf = w => (w.match(/[ぁ-ゖー]+$/)||[''])[0];
+const kPre = w => (w.match(/^[ぁ-ゖー]+/)||[''])[0];
+function kanjiDistractors(w, yomi, grade){
+  if(KANJI_CHOICES[w] && KANJI_CHOICES[w].length>=3) return shuffle(KANJI_CHOICES[w]).slice(0,3);
+  const suf=kSuf(w), pre=kPre(w), near = r => Math.abs(r.length-yomi.length);
+  if(!suf && !pre){
+    // 送り仮名なし → 送り仮名の ない 言葉の 読みから
+    const same = KANJI[grade].filter(([x,y])=>!/[ぁ-ゖ]/.test(x) && y!==yomi).map(k=>k[1]);
+    return shuffle([...new Set(same)]).sort((a,b)=>near(a)-near(b)).slice(0,6).sort(()=>Math.random()-.5).slice(0,3);
+  }
+  // 送り仮名あり → 同じ 送り仮名で 終わる 読みから（その学年の 言葉 → ほかの学年 → 単語帳 の じゅん）
+  const ok = r => r!==yomi && r.endsWith(suf) && r.startsWith(pre) && r.length>suf.length+pre.length;
+  const sameOkuri = list => list.filter(([x])=>kSuf(x)===suf && kPre(x)===pre).map(k=>k[1]);
+  const tiers = [ sameOkuri(KANJI[grade]),
+                  sameOkuri([].concat(...Object.keys(KANJI).filter(g=>+g!==grade).map(g=>KANJI[g]))),
+                  KANA_LEX ];
+  const out=[], seen=new Set([yomi]);
+  for(const t of tiers){ for(const r of shuffle(t).sort((a,b)=>near(a)-near(b))){ if(out.length>=3) break; if(ok(r) && !seen.has(r)){ seen.add(r); out.push(r); } } }
+  return out;
+}
+function kanjiQuestion(grade, used){
+  const pool = KANJI[grade].filter(k=>!used.has(k[0]));
+  const [w, yomi] = pick(pool.length?pool:KANJI[grade]);
+  used.add(w);
+  const ch = [yomi, ...kanjiDistractors(w, yomi, grade)];
+  return mk(`<span class="kanji">${w}</span>`, yomi, shuffle(ch).map(v=>({html:v,key:v})), 'この かんじ、なんと よむ？', `${w}（${yomi}）`, false,
+    `「${yomi[0]}」から はじまる ことばだよ（${yomi.length}もじ）`);
+}
+
+
+/* ========= こくご：みじかい 文章もんだい（各学年 4文章 × 2問 ＝ 8問） =========
+   q: しつもん, a: [正解, まちがい, まちがい, まちがい], h: ヒントで さす 文章の ことば */
+const READING = {
+  1:[
+    {t:'きょうは はれです。ゆいさんは いぬの ポチと こうえんへ いきました。ポチは しろい ボールを おいかけて はしりました。',
+     qs:[{q:'ゆいさんは だれと こうえんへ いきましたか。',a:['いぬの ポチ','おかあさん','ねこの タマ','ともだち'],h:'こうえんへ いきました'},
+         {q:'ポチは なにを おいかけましたか。',a:['しろい ボール','あかい ボール','ちょうちょ','とり'],h:'おいかけて'}]},
+    {t:'あさ、はなに みずを やりました。あかい はなが 三つ、きいろい はなが 二つ さいて いました。',
+     qs:[{q:'あかい はなは いくつ さいて いましたか。',a:['三つ','二つ','五つ','一つ'],h:'あかい はなが'},
+         {q:'いつ みずを やりましたか。',a:['あさ','ひる','ゆうがた','よる'],h:'みずを やりました'}]},
+    {t:'けんたさんは ねる まえに えほんを よみます。きょうは くまが ケーキを つくる おはなしでした。',
+     qs:[{q:'けんたさんは いつ えほんを よみますか。',a:['ねる まえ','あさごはんの あと','がっこうで','おふろで'],h:'えほんを よみます'},
+         {q:'くまが なにを つくる おはなしでしたか。',a:['ケーキ','パン','おにぎり','いえ'],h:'つくる おはなし'}]},
+    {t:'なつやすみに うみへ いきました。すなはまで おおきな かいを 見つけました。かいを みみに あてると、なみの おとが きこえました。',
+     qs:[{q:'どこへ いきましたか。',a:['うみ','やま','かわ','どうぶつえん'],h:'いきました'},
+         {q:'かいを みみに あてると、なにが きこえましたか。',a:['なみの おと','とりの こえ','かぜの おと','あめの おと'],h:'きこえました'}]}
+  ],
+  2:[
+    {t:'わたしの クラスでは メダカを かっています。メダカは 小さな 魚で、水草の かげに たまごを うみます。毎朝 当番が えさを あげます。',
+     qs:[{q:'メダカは どこに たまごを うみますか。',a:['水草の かげ','石の 上','すなの 中','水の 上'],h:'たまごを うみます'},
+         {q:'えさは だれが あげますか。',a:['当番','先生','クラスの ぜんいん','わたしだけ'],h:'えさを あげます'}]},
+    {t:'ひろとさんは 雨の 日が すきでは ありませんでした。でも、新しい 青い かさを 買って もらってから、雨の 日が 少し たのしみに なりました。',
+     qs:[{q:'ひろとさんが 雨の 日を たのしみに なったのは なぜですか。',a:['新しい かさを 買って もらったから','雨が 大すきだったから','学校が 休みに なるから','友だちと あそべるから'],h:'買って もらってから'},
+         {q:'かさは 何色ですか。',a:['青','赤','黄色','白'],h:'でも、'}]},
+    {t:'秋に なると、山の 木が 赤や 黄色に かわります。りすは 冬に そなえて、どんぐりを 土の 中に かくします。',
+     qs:[{q:'りすは どんぐりを どこに かくしますか。',a:['土の 中','木の 上','川の そば','いえの 中'],h:'かくします'},
+         {q:'りすが どんぐりを かくすのは なぜですか。',a:['冬に そなえるため','友だちに あげるため','あそぶため','春に うえるため'],h:'冬に そなえて'}]},
+    {t:'日曜日、おじいさんと つりに 行きました。さいしょは 一ぴきも つれませんでしたが、昼すぎに 大きな 魚が 二ひき つれました。',
+     qs:[{q:'魚が つれたのは いつですか。',a:['昼すぎ','朝','夕方','夜'],h:'大きな 魚が'},
+         {q:'魚は ぜんぶで 何びき つれましたか。',a:['二ひき','一ぴき','三びき','つれなかった'],h:'昼すぎに'}]}
+  ],
+  3:[
+    {t:'ダンゴムシは、さわると 体を 丸めます。こうして かたい からで 体を 守るのです。落ち葉の 下など、しめった 場所を このんで すんで います。',
+     qs:[{q:'ダンゴムシは さわると どう なりますか。',a:['体を 丸める','にげ出す','とびはねる','色が かわる'],h:'さわると'},
+         {q:'ダンゴムシが このむ 場所は どこですか。',a:['しめった 場所','かわいた 場所','明るい 場所','高い 場所'],h:'このんで'}]},
+    {t:'まりさんは 運動会の リレーで ころんで しまいました。くやしくて なみだが 出ましたが、すぐに 立ち上がって さいごまで 走りました。クラスの みんなが 大きな はく手を おくりました。',
+     qs:[{q:'まりさんは リレーで どう なりましたか。',a:['ころんで しまった','一番に なった','出られなかった','バトンを わすれた'],h:'リレーで'},
+         {q:'みんなが はく手を おくったのは なぜだと 考えられますか。',a:['さいごまで 走ったから','一番に なったから','なかなかったから','歌を 歌ったから'],h:'さいごまで 走りました'}]},
+    {t:'むかしの 人は、カレンダーの かわりに 月の 形を 見て 日にちを 数えて いました。月は 約三十日で 同じ 形に もどるからです。',
+     qs:[{q:'むかしの 人は 何を 見て 日にちを 数えましたか。',a:['月の 形','太陽の 色','星の 数','雲の 形'],h:'日にちを 数えて'},
+         {q:'月が 同じ 形に もどるのは 約何日ですか。',a:['約三十日','約七日','約十日','約百日'],h:'同じ 形に もどる'}]},
+    {t:'たけしさんの 家の 畑では、夏に トマトと きゅうりが とれます。トマトは 赤く なったら しゅうかくします。きゅうりは 大きく なりすぎると かたく なるので、早めに とります。',
+     qs:[{q:'きゅうりを 早めに とるのは なぜですか。',a:['大きく なりすぎると かたく なるから','赤く なるから','虫が くるから','雨が ふるから'],h:'かたく なるので'},
+         {q:'トマトは どう なったら しゅうかくしますか。',a:['赤く なったら','大きく なったら','黄色く なったら','やわらかく なったら'],h:'しゅうかくします'}]}
+  ],
+  4:[
+    {t:'ツバメは 春に 南の 国から 日本へ わたって きます。人の 家の のき下に すを 作るのは、カラスなどの てきが 近づきにくいからだと 考えられて います。',
+     qs:[{q:'ツバメは どこから 日本へ 来ますか。',a:['南の 国','北の 国','山の おく','海の 中'],h:'わたって きます'},
+         {q:'ツバメが 人の 家に すを 作る 理由として 考えられて いることは？',a:['てきが 近づきにくいから','えさが 多いから','雨に ぬれないから','人が すきだから'],h:'考えられて います'}]},
+    {t:'さくらさんは、図書係として 本の 整理を まかされた。最初は 面どうだと 思って いたが、本を 分類して ならべるうちに、知らなかった 本と たくさん 出会えた。今では 係の 仕事が 楽しみに なって いる。',
+     qs:[{q:'最初、さくらさんは 係の 仕事を どう 思って いましたか。',a:['面どうだ','楽しそうだ','かんたんだ','こわい'],h:'最初は'},
+         {q:'さくらさんの 気持ちは どう 変わりましたか。',a:['楽しみに なった','いやに なった','つかれて しまった','変わらなかった'],h:'今では'}]},
+    {t:'水は 冷やすと 氷に なり、あたためると 水じょう気に なります。氷に なると 体積が ふえるので、ペットボトルに 水を いっぱいに 入れて こおらせると、ふくらんで しまいます。',
+     qs:[{q:'水を 冷やすと 何に なりますか。',a:['氷','水じょう気','雲','雨'],h:'冷やすと'},
+         {q:'こおらせた ペットボトルが ふくらむのは なぜですか。',a:['氷に なると 体積が ふえるから','温度が 上がるから','空気が 入るから','水が へるから'],h:'ペットボトル'}]},
+    {t:'町の 商店街で、毎月 第一日曜日に 朝市が 開かれる。地元の 農家が とれたての 野菜を 安く 売るので、早い 時間から 多くの 人で にぎわう。',
+     qs:[{q:'朝市は いつ 開かれますか。',a:['毎月 第一日曜日','毎週 土曜日','毎日','年に 一回'],h:'朝市が 開かれる'},
+         {q:'朝市が にぎわう 理由は 何ですか。',a:['とれたての 野菜が 安く 買えるから','有名人が 来るから','夜おそくまで 開いて いるから','会場が 広いから'],h:'安く 売るので'}]}
+  ],
+  5:[
+    {t:'森林は「緑のダム」と よばれる ことが ある。森の 土は スポンジのように 雨水を たくわえ、少しずつ 川へ 流す。そのため、大雨の ときに こう水が 起こりにくく、晴れの 日が 続いても 川の 水が かれにくいのだ。',
+     qs:[{q:'森林が「緑のダム」と よばれる 理由は 何ですか。',a:['土が 雨水を たくわえて 少しずつ 流すから','木で ダムを 作るから','森には 湖が 多いから','森には 雨が ふらないから'],h:'森の 土は'},
+         {q:'この 文章で、森の 土は 何に たとえられて いますか。',a:['スポンジ','石','かがみ','紙'],h:'のように'}]},
+    {t:'けんじは、サッカーの 試合で PKを 外して しまった。帰り道、だまって 歩く けんじに、キャプテンの ゆうたが「次も おまえに けって ほしい」と 声を かけた。けんじは 顔を 上げ、小さく うなずいた。',
+     qs:[{q:'ゆうたの 言葉を 聞いた けんじの 気持ちに 近い ものは どれですか。',a:['もう一度 がんばろうと 思った','サッカーを やめたく なった','ゆうたに 腹を 立てた','何も 感じなかった'],h:'顔を 上げ'},
+         {q:'けんじが 帰り道に だまって いたのは なぜですか。',a:['PKを 外して 落ちこんで いたから','つかれて ねむかったから','ゆうたと けんかしたから','試合に 勝ったから'],h:'試合で'}]},
+    {t:'日本の 食料自給率は カロリーベースで 約四割で、多くの 食料を 外国からの 輸入に たよって いる。輸入が とだえると 食料が 不足する おそれが あるため、国内の 生産を 守る ことが 大切だと 言われて いる。',
+     qs:[{q:'日本の 食料自給率（カロリーベース）は 約何割ですか。',a:['約四割','約八割','約一割','約十割'],h:'食料自給率は'},
+         {q:'国内の 生産を 守る ことが 大切な 理由は 何ですか。',a:['輸入が とだえると 食料が 不足する おそれが あるから','外国の 食べ物は 高いから','輸入が 禁止されたから','農家が 多すぎるから'],h:'大切だと'}]},
+    {t:'ハチドリは 世界で 最も 小さい 鳥の なかまで、一秒間に 数十回も 羽を 動かす。そのため 空中で 止まる「ホバリング」が でき、花の みつを すう ことが できる。',
+     qs:[{q:'ハチドリが 空中で 止まれるのは なぜですか。',a:['羽を とても 速く 動かすから','しっぽが 長いから','風に のるから','足が 強いから'],h:'そのため'},
+         {q:'空中で 止まる ことを 何と いいますか。',a:['ホバリング','ジャンプ','ダイビング','グライダー'],h:'空中で 止まる'}]}
+  ],
+  6:[
+    {t:'プラスチックごみの 一部は、波や 紫外線で くだけて 五ミリメートル以下の「マイクロプラスチック」に なる。小さすぎて 回収が むずかしく、魚が えさと まちがえて 食べて しまう ことも ある。ごみを 減らす ためには、使い捨ての 製品を なるべく 選ばない ことが 大切だ。',
+     qs:[{q:'マイクロプラスチックとは どのくらいの 大きさの ものですか。',a:['五ミリメートル以下','五センチメートル以下','五十センチメートル以下','五メートル以下'],h:'以下の'},
+         {q:'筆者が 大切だと 考えて いることは 何ですか。',a:['使い捨ての 製品を なるべく 選ばない こと','魚を 食べない こと','海に 行かない こと','プラスチックを 燃やす こと'],h:'大切だ'}]},
+    {t:'祖母の 家の 縁側で、ぼくは 夕焼けを ながめて いた。「この 景色も 来年は 見られないね」と 祖母が つぶやいた。この 家は 取りこわされる ことに なったのだ。ぼくは 何も 言えず、ただ 空の 色が 変わって いくのを 見つめて いた。',
+     qs:[{q:'祖母が「来年は 見られない」と 言ったのは なぜですか。',a:['家が 取りこわされるから','天気が 悪く なるから','夕焼けが なくなるから','ぼくが 遠くへ 行くから'],h:'この 家は'},
+         {q:'「ぼく」の 気持ちに 最も 近い ものは どれですか。',a:['さびしくて 言葉が 見つからない','うれしくて わくわくして いる','いかりで いっぱいだ','少しも 気に して いない'],h:'何も 言えず'}]},
+    {t:'江戸時代の 町では、ものを 修理して 長く 使う ことが あたりまえだった。割れた 茶わんを つなぐ 職人や、古い 着物を 買い取って 仕立て直す 店も あった。現代の「リサイクル社会」の お手本とも いえる。',
+     qs:[{q:'江戸時代の 町の 様子として 正しい ものは どれですか。',a:['ものを 修理して 長く 使った','新しい ものを すぐ 買った','ごみを 海に 捨てた','茶わんを 使わなかった'],h:'あたりまえだった'},
+         {q:'筆者は 江戸時代の くらしを 何と 表現して いますか。',a:['リサイクル社会の お手本','ぜいたくな くらし','不便な くらし','外国の まね'],h:'現代の'}]},
+    {t:'ことわざ「急がば回れ」は、急いで いる ときほど、危ない 近道より 安全で 確実な 方法を 選んだ ほうが、結局は 早いという 意味だ。',
+     qs:[{q:'「急がば回れ」の 意味に 合う 行動は どれですか。',a:['時間が なくても 確かめながら ていねいに 作業する','近道を 走って 行く','何も しないで 待つ','人に たのんで しまう'],h:'安全で 確実な'},
+         {q:'この ことわざが すすめて いるのは どんな 方法ですか。',a:['安全で 確実な 方法','いちばん 近い 方法','お金の かからない 方法','いちばん 楽な 方法'],h:'方法を 選んだ'}]}
+  ]
+};
+function readingQuestions(grade){
+  const list=[];
+  READING[grade].forEach((p,pi)=>p.qs.forEach((x,qi)=>{
+    list.push(mk(`<div class="rq">${x.q}</div><div class="passage">${p.t}</div>`, x.a[0],
+      shuffle(x.a).map(v=>({html:v,key:v})), 'よんで こたえよう', x.a[0], true,
+      `文章の「${x.h}」の ところを よく 読もう`));
+    list[list.length-1].pid = pi;
+  }));
+  return list;
+}
+
+
+/* ========= こくご：文章を 各学年 4つ ついか（合計 8文章 × 2問 ＝ 16問） ========= */
+const READING_MORE = {
+  1:[
+    {t:'ねこの ミケは、まどの そばで ねるのが すきです。おひさまが あたると、ミケは まるく なって めを とじます。',
+     qs:[{q:'ミケは どこで ねるのが すきですか。',a:['まどの そば','ベッドの うえ','はこの なか','にわ'],h:'すきです'},
+         {q:'おひさまが あたると、ミケは どう なりますか。',a:['まるく なって めを とじる','はしりまわる','なきだす','ごはんを たべる'],h:'あたると'}]},
+    {t:'たろうさんは がっこうで あさがおの たねを まきました。まいにち みずを やると、三日めに 小さな めが でました。',
+     qs:[{q:'なにの たねを まきましたか。',a:['あさがお','ひまわり','ミニトマト','チューリップ'],h:'がっこうで'},
+         {q:'めが でたのは なんにちめですか。',a:['三日め','一日め','五日め','十日め'],h:'小さな めが'}]},
+    {t:'ゆうがた、そらが あかく なりました。からすが「カア カア」と なきながら、やまの ほうへ とんで いきました。',
+     qs:[{q:'そらは なにいろに なりましたか。',a:['あか','あお','くろ','しろ'],h:'ゆうがた'},
+         {q:'からすは どこへ とんで いきましたか。',a:['やまの ほう','うみの ほう','がっこう','いえの なか'],h:'とんで いきました'}]},
+    {t:'あきこさんの おとうとは 三さいです。おとうとは くるまの おもちゃが だいすきで、いつも もって あるいて います。',
+     qs:[{q:'おとうとは なんさいですか。',a:['三さい','一さい','五さい','七さい'],h:'あきこさんの'},
+         {q:'おとうとが だいすきな ものは なんですか。',a:['くるまの おもちゃ','えほん','ぬいぐるみ','ボール'],h:'いつも もって'}]}
+  ],
+  2:[
+    {t:'こうえんの 池に、カモの おやこが いました。おやの あとを、子どもの カモが 五わ ならんで およいで いきました。',
+     qs:[{q:'池に いたのは なんですか。',a:['カモの おやこ','カメの おやこ','コイ','アヒル'],h:'こうえんの 池に'},
+         {q:'子どもの カモは なんわ いましたか。',a:['五わ','三わ','二わ','十わ'],h:'ならんで'}]},
+    {t:'ゆうきさんは、きゅう食の にんじんが にがてでした。でも、自分で そだてた にんじんを 食べて みたら、あまくて おいしいと かんじました。',
+     qs:[{q:'ゆうきさんの にがてな 食べものは 何でしたか。',a:['にんじん','ピーマン','トマト','なす'],h:'にがてでした'},
+         {q:'自分で そだてた にんじんは どんな あじでしたか。',a:['あまくて おいしい','にがい','からい','すっぱい'],h:'食べて みたら'}]},
+    {t:'たんぽぽの 花が さいた あと、わた毛が できます。わた毛は 風に のって 遠くまで とんで いき、そこで また 花を さかせます。',
+     qs:[{q:'たんぽぽの 花が さいた あとに 何が できますか。',a:['わた毛','実','はっぱ','ねっこ'],h:'さいた あと'},
+         {q:'わた毛は 何に のって とんで いきますか。',a:['風','水','虫','鳥'],h:'遠くまで'}]},
+    {t:'ゆいさんの おばあさんは、毎日 ノートに 日記を 書いて います。もう 十年も つづけて いると 話して くれました。',
+     qs:[{q:'おばあさんは 毎日 何を 書いて いますか。',a:['日記','手紙','え','作文'],h:'毎日 ノートに'},
+         {q:'何年 つづけて いますか。',a:['十年','一年','三年','百年'],h:'話して くれました'}]}
+  ],
+  3:[
+    {t:'ミツバチは、花の みつや 花ふんを 集めて すに 運びます。えさの ある 場所を 見つけた ハチは、おしりを ふる ダンスで、なかまに その 場所を 知らせます。',
+     qs:[{q:'ミツバチは 何を 集めますか。',a:['花の みつや 花ふん','木の 葉','小石','どろ'],h:'すに 運びます'},
+         {q:'ハチが ダンスを するのは 何の ためですか。',a:['なかまに えさの 場所を 知らせるため','あそぶため','てきを おどかすため','ねむるため'],h:'おしりを ふる'}]},
+    {t:'けいたさんは、算数の テストで 九十点を とりました。でも、まちがえた 一問を 見直すと、計算の 書きまちがいでした。「次は ていねいに 書こう」と けいたさんは 思いました。',
+     qs:[{q:'けいたさんは テストで 何点でしたか。',a:['九十点','百点','八十点','五十点'],h:'算数の テストで'},
+         {q:'けいたさんが まちがえた 理由は 何ですか。',a:['計算の 書きまちがい','問題を 読まなかった','時間が なかった','九九を わすれた'],h:'見直すと'}]},
+    {t:'カタツムリは、雨の 日に よく 見られます。体が かわくのが にがてなので、晴れた 日は 葉の うらや 石の 下に かくれて います。',
+     qs:[{q:'カタツムリが よく 見られるのは どんな 日ですか。',a:['雨の 日','晴れた 日','風の 強い 日','雪の 日'],h:'よく 見られます'},
+         {q:'晴れた 日に かくれて いるのは なぜですか。',a:['体が かわくのが にがてだから','鳥が こわいから','ねむいから','暑いのが すきだから'],h:'にがてなので'}]},
+    {t:'わたしの 町には、百年以上 つづく 和がし屋さんが あります。おじいさんの 代から 同じ 作り方で、毎朝 早く から あんこを にて います。',
+     qs:[{q:'和がし屋さんは どのくらい つづいて いますか。',a:['百年以上','十年','五十年','一年'],h:'つづく'},
+         {q:'毎朝 早く から 何を して いますか。',a:['あんこを にて いる','パンを やいて いる','店を そうじして いる','魚を つって いる'],h:'毎朝 早く'}]}
+  ],
+  4:[
+    {t:'ホタルが 光るのは、なかまに 合図を 送る ためだと 考えられて いる。ホタルの よう虫は、きれいな 川に すむ カワニナという 貝を 食べて 育つ。そのため、ホタルが すめるかどうかは、川の よごれぐあいを 知る 手がかりにも なる。',
+     qs:[{q:'ホタルが 光るのは 何の ためだと 考えられて いますか。',a:['なかまに 合図を 送るため','えさを さがすため','体を あたためるため','道を 照らすため'],h:'考えられて いる'},
+         {q:'ホタルの よう虫は 何を 食べて 育ちますか。',a:['カワニナという 貝','木の 葉','小さな 魚','花の みつ'],h:'よう虫は'}]},
+    {t:'はるとは、リレーの 選手に えらばれた。しかし、練習で バトンを 何度も 落として しまい、だんだん 自信が なくなって いった。そんな とき、友だちの そうたが「いっしょに 練習しよう」と 言って、毎日 放課後に つきあって くれた。',
+     qs:[{q:'はるとが 自信を なくしたのは なぜですか。',a:['バトンを 何度も 落としたから','足が おそいから','選手に えらばれなかったから','けがを したから'],h:'しかし'},
+         {q:'そうたは どんな 友だちだと いえますか。',a:['やさしく 助けて くれる 友だち','いじわるな 友だち','何も しない 友だち','競争相手でしか ない 友だち'],h:'つきあって くれた'}]},
+    {t:'点字は、目の 不自由な 人が 指で さわって 読む 文字だ。小さな 六つの 点の 組み合わせで 一つの 文字を 表す。駅の 券売機や エレベーターの ボタンなど、身の回りの いろいろな 所で 使われて いる。',
+     qs:[{q:'点字は どのように して 読む 文字ですか。',a:['指で さわって','耳で 聞いて','目で 見て','声に 出して'],h:'目の 不自由な'},
+         {q:'点字の 一つの 文字は いくつの 点の 組み合わせですか。',a:['六つ','三つ','四つ','十こ'],h:'組み合わせで'}]},
+    {t:'わたしの 家では、生ごみを たいひに して、畑の 肥料に して いる。ごみが へる うえに、野菜も よく 育つので、一石二鳥だ。',
+     qs:[{q:'生ごみを 何に して いますか。',a:['たいひ（畑の 肥料）','もえる ごみ','動物の えさ','紙'],h:'わたしの 家では'},
+         {q:'「一石二鳥」とは どういう 意味ですか。',a:['一つの ことで 二つの よい ことが ある','鳥を 二わ かう','石を 二つ 集める','一つも よい ことが ない'],h:'うえに'}]}
+  ],
+  5:[
+    {t:'ペンギンは 鳥の なかまだが、空を 飛ぶ ことは できない。そのかわり、つばさを ひれの ように 使って、水中を すばやく 泳ぐ ことが できる。',
+     qs:[{q:'ペンギンが できない ことは 何ですか。',a:['空を 飛ぶ こと','泳ぐ こと','歩く こと','魚を 食べる こと'],h:'鳥の なかまだが'},
+         {q:'ペンギンは つばさを 何の ように 使いますか。',a:['ひれ','うで','ほうき','かさ'],h:'そのかわり'}]},
+    {t:'みさきは、合唱コンクールで ピアノの 伴奏を まかされた。本番の 前日、きんちょうで 指が ふるえた。しかし、母が「失敗しても いいから、楽しんで ひいてごらん」と 言って くれたので、気持ちが 少し 軽く なった。',
+     qs:[{q:'本番の 前日、みさきは どんな 様子でしたか。',a:['きんちょうして 指が ふるえた','わくわくして ねむれなかった','かぜを ひいた','ピアノを 休んだ'],h:'本番の 前日'},
+         {q:'母の 言葉で、みさきの 気持ちは どう なりましたか。',a:['少し 軽く なった','もっと 重く なった','おこりだした','何も かわらなかった'],h:'言って くれたので'}]},
+    {t:'日本では、まだ 食べられるのに 捨てられる 食品、いわゆる「食品ロス」が 大量に 出て いる。買いすぎない、食べきれる 量だけ 作るなど、一人一人の 心がけで へらす ことが できる。',
+     qs:[{q:'「食品ロス」とは 何ですか。',a:['まだ 食べられるのに 捨てられる 食品','くさった 食品','外国の 食品','ねだんの 高い 食品'],h:'いわゆる'},
+         {q:'食品ロスを へらす 方法として 文章に あるのは どれですか。',a:['食べきれる 量だけ 作る','たくさん 買って おく','毎日 外食する','冷ぞう庫を 使わない'],h:'心がけで'}]},
+    {t:'ことわざ「ちりも積もれば山となる」は、ほんの わずかな ものでも、積み重なれば 大きな ものに なる という 意味だ。毎日 少しずつ 勉強を 続ける ことの 大切さを 表す ときにも 使われる。',
+     qs:[{q:'この ことわざの 意味に 合う ものは どれですか。',a:['小さな ことでも 積み重ねると 大きく なる','ごみは すぐに 捨てる','山に のぼるのは 大変だ','一度に たくさん やる'],h:'という 意味'},
+         {q:'この ことわざは、どんな ことの 大切さを 表す ときに 使われますか。',a:['毎日 少しずつ 続ける こと','しっかり 休む こと','早く 終わらせる こと','人に まかせる こと'],h:'大切さ'}]}
+  ],
+  6:[
+    {t:'ミツバチが 減って いる という 報告が 世界各地で ある。ミツバチは 花粉を 運び、多くの 作物の 実りを 助けて いる。ミツバチが いなく なれば、私たちの 食卓にも 大きな えいきょうが 出ると 心配されて いる。',
+     qs:[{q:'ミツバチの 役割として 文章に あるのは どれですか。',a:['花粉を 運んで 作物の 実りを 助ける','害虫を 食べる','土を たがやす','雨を ふらせる'],h:'ミツバチは'},
+         {q:'心配されて いる ことは 何ですか。',a:['食卓に 大きな えいきょうが 出る こと','はちみつの ねだんが 下がる こと','ハチに さされる 人が ふえる こと','花が ふえすぎる こと'],h:'いなく なれば'}]},
+    {t:'転校して きた 初日、ぼくは だれとも 話せずに 休み時間を すごした。帰ろうと した とき、となりの 席の けんが「明日、サッカーやらない？」と 声を かけて くれた。その 一言で、明日が 少し 楽しみに なった。',
+     qs:[{q:'転校初日の 休み時間、「ぼく」は どう して いましたか。',a:['だれとも 話せずに いた','サッカーを して いた','本を 読んで いた','先生と 話して いた'],h:'初日'},
+         {q:'けんの 言葉で、「ぼく」の 気持ちは どう 変わりましたか。',a:['明日が 少し 楽しみに なった','学校に 行きたく なくなった','いかりを 感じた','何も 変わらなかった'],h:'その 一言で'}]},
+    {t:'日本には 百以上の 活火山が ある。火山は ふん火に よる 災害を もたらす 一方で、温泉や 美しい 景色、地熱発電などの めぐみも 与えて くれる。',
+     qs:[{q:'日本に ある 活火山の 数は どのくらいですか。',a:['百以上','十くらい','三つ','一つも ない'],h:'日本には'},
+         {q:'火山の めぐみとして 文章に 書かれて いない ものは どれですか。',a:['石油','温泉','美しい 景色','地熱発電'],h:'一方で'}]},
+    {t:'「情けは人のためならず」という ことわざは、人に 親切に すれば、めぐりめぐって 自分にも よい ことが 返って くる という 意味だ。「親切は その 人の ためにならない」という 意味だと 思って いる 人も 多いが、それは まちがいである。',
+     qs:[{q:'この ことわざの 正しい 意味は どれですか。',a:['親切に すれば 自分にも よい ことが 返って くる','親切は 相手の ためにならない','人に たよっては いけない','自分の ことだけ 考えるべきだ'],h:'という 意味だ'},
+         {q:'筆者が「まちがい」だと 言って いるのは どんな 考えですか。',a:['親切は その人の ためにならないという 考え','人に 親切に する という 考え','ことわざを 使う という 考え','人を 助ける という 考え'],h:'思って いる 人も'}]}
+  ]
+};
+for(const g in READING_MORE) READING[g].push(...READING_MORE[g]);
+
+/* ========= せいかつ（1・2年）／りか・しゃかい（3〜6年）
+   [しつもん, せいかい, まちがい, まちがい, まちがい, ヒント] ========= */
+const QBANK = {
+  seikatsu:{
+    1:[
+      ['あさがおの たねを まいて、さいしょに でて くる はっぱを なんと いう？','ふたば','ほんば','つぼみ','ねっこ','2まいの まるい はっぱだよ'],
+      ['あさがおの はなが さくのは いつごろ？','あさ','ひる','ゆうがた','よなか','なまえに ヒントが あるよ'],
+      ['あさがおの たねは どんな いろ？','くろっぽい ちゃいろ','みどり','しろ','ピンク','はなが おわった あとの みの なかに あるよ'],
+      ['どうろを わたる ときは どこを わたる？','おうだんほどう','どこでも よい','くるまの すぐ まえ','カーブの ところ','しろい しまもようの ところだよ'],
+      ['しんごうが あかの ときは どう する？','とまる','わたる','はしって わたる','てを あげて わたる','「とまれ」の いろだよ'],
+      ['しんごうが あおでも、わたる まえに する ことは？','みぎと ひだりを みる','はしりだす','めを つぶる','うしろを むく','くるまが こないか たしかめよう'],
+      ['はるに さく はなは どれ？','さくら','ひまわり','コスモス','あさがお','にゅうがくしきの ころに さくよ'],
+      ['なつに さく、おおきな きいろい はなは？','ひまわり','さくら','チューリップ','うめ','たいようの ほうを むいて さくよ'],
+      ['あきに なると きいろく なる、おうぎの かたちの はっぱの きは？','いちょう','まつ','たけ','さくら','ぎんなんの みが なるよ'],
+      ['ふゆの さむい あさ、みずが つめたく なって できる ものは？','こおり','にじ','かみなり','ほたる','つるつる すべるよ'],
+      ['がっこうで けがを したら どこへ いく？','ほけんしつ','としょしつ','おんがくしつ','たいいくかん','けがや びょうきを みて くれる へや'],
+      ['ほんを かりる ことが できる へやは？','としょしつ','ほけんしつ','しょくいんしつ','りかしつ','ほんが いっぱい ある へや'],
+      ['ともだちに ものを かりた ときに いう ことばは？','ありがとう','さようなら','いただきます','おやすみ','かんしゃの きもちを つたえよう'],
+      ['ごはんを たべる まえに いう ことばは？','いただきます','ごちそうさま','いってきます','ただいま','たべる「まえ」の あいさつ'],
+      ['いえを でる ときに いう ことばは？','いってきます','ただいま','おかえり','おやすみなさい','でかける ときの あいさつ'],
+      ['ダンゴムシが よく いる ところは？','いしや おちばの した','そらの うえ','みずの なか','きの てっぺん','じめじめ した ところが すき'],
+      ['うさぎの たべものは？','にんじんや はっぱ','おにく','さかな','あめ','やさいを たべるよ'],
+      ['すべりだいを すべる ときは？','まえを むいて すわって すべる','さかさまに すべる','たって すべる','みんなで いっしょに すべる','あんぜんな すべりかたを かんがえよう'],
+      ['てを あらうと よいのは どんな とき？','そとから かえった とき','ねる まえだけ','あさ おきた ときだけ','あらわなくて よい','ばいきんが つきやすい ときだよ'],
+      ['シャボンだまを ふくと できる かたちは？','まる','しかく','さんかく','ほし','ボールと おなじ かたち'],
+      ['かぜが ふくと くるくる まわる おもちゃは？','かざぐるま','けんだま','おはじき','あやとり','「かぜ」が なまえに はいって いるよ'],
+      ['あきに こうえんで ひろえる きの みは？','どんぐり','さくらんぼ','いちご','すいか','ぼうしを かぶった みだよ'],
+      ['なつの よるに ひかる むしは？','ほたる','ちょうちょう','てんとうむし','あり','おしりが ひかるよ'],
+      ['セミが なくのは どの きせつ？','なつ','はる','あき','ふゆ','いちばん あつい きせつだよ'],
+      ['かえるの こどもは？','おたまじゃくし','ひよこ','いもむし','やご','しっぽで みずの なかを およぐよ'],
+      ['ちょうちょうの こどもは？','あおむし','おたまじゃくし','やご','ひよこ','はっぱを むしゃむしゃ たべるよ'],
+      ['きゅうしょくを つくって くれる ひとは？','ちょうりいんさん','けいさつかんさん','しょうぼうしさん','おいしゃさん','りょうりを する ひとだよ'],
+      ['けいさつに でんわする ときの ばんごうは？','110','119','117','177','かじの ときの ばんごうとは ちがうよ'],
+      ['かじや きゅうきゅうしゃを よぶ ときの ばんごうは？','119','110','117','177','けいさつの ばんごうとは ちがうよ'],
+      ['ふゆに そらから ふって くる しろい ものは？','ゆき','さくらの はなびら','たんぽぽの わたげ','あられ','さわると つめたくて、つもると あそべるよ']
+    ],
+    2:[
+      ['ミニトマトの みは、さいしょ なにいろ？','みどり','あか','きいろ','むらさき','あかく なる まえの いろだよ'],
+      ['やさいを そだてる とき、まいにち すると よい ことは？','みずやり','はっぱを ぜんぶ とる','ひかげに しまう','つちを ふみかためる','のどが かわくのは やさいも おなじ'],
+      ['ナスの みの いろは？','むらさき','あか','きいろ','しろ','ぶどうに にた いろだよ'],
+      ['キュウリの はなの いろは？','きいろ','むらさき','あお','くろ','ひまわりと にた いろだよ'],
+      ['じゃがいもは どこに できる？','つちの なか','はっぱの うえ','はなの なか','くきの さき','ほって とりだすよ'],
+      ['まちたんけんで みせの 人に はなしを きく ときに だいじな ことは？','あいさつを して ていねいに きく','いきなり しつもんする','おおごえで さわぐ','かってに みせの おくに はいる','れいぎ ただしく しよう'],
+      ['ゆうびんきょくで できる ことは？','てがみを だす','本を かりる','びょうきを みて もらう','かじを けす','ポストと おなじ マークだよ'],
+      ['としょかんで まもる ことは？','しずかに する','はしりまわる','たべながら よむ','本に らくがきする','みんなが 本を よむ ばしょだよ'],
+      ['こうばんに いる 人は？','けいさつかん','しょうぼうし','かんごし','えきいん','まちの あんぜんを まもる 人'],
+      ['でんしゃに のる ときの マナーは？','おりる 人が さき','のる 人が さき','かけこむ','ドアの まえで たちどまる','ドアが ひらいたら、まず だれが うごく？'],
+      ['ザリガニの はさみは なんぼん？','2ほん','4ほん','6ぽん','8ほん','みぎと ひだりに ひとつずつ'],
+      ['ザリガニが すんで いる ところは？','たんぼや いけ','そらの うえ','さばく','きの うえ','みずの ある ところだよ'],
+      ['カブトムシの ようちゅうが すんで いる ところは？','ふようどの なか','みずの なか','はっぱの うら','いしの うえ','おちばが くさって できた つち'],
+      ['ダンゴムシの あしは なんぼん？','14ほん','6ぽん','8ほん','100ぽん','こんちゅうの 6ぽんより おおいよ'],
+      ['トンボの こどもは？','やご','あおむし','おたまじゃくし','いもむし','みずの なかで くらすよ'],
+      ['むしを かう ときに だいじな ことは？','すみかや えさを しらべて よういする','せまい はこに たくさん いれる','えさを あげない','ひなたに ずっと おく','むしが いた ばしょを おもいだそう'],
+      ['ゴムで うごく おもちゃ。ゴムを たくさん ねじると？','よく うごく','うごかなく なる','いろが かわる','おとが なる','ゴムが もとに もどろうと する ちから'],
+      ['じしゃくに くっつく ものは？','てつの くぎ','かみ','プラスチック','わりばし','かたい きんぞくの なかま'],
+      ['いきものを さわった あとに する ことは？','てを あらう','そのまま ごはんを たべる','ふくで ふく','なにも しない','ばいきんを おとそう'],
+      ['あきに まっかに なる、てのひらの ような はっぱは？','もみじ','まつ','たけ','すぎ','「こうよう」で きれいに いろづくよ'],
+      ['じぶんが うまれた ときの ことを しるために、きくと よい 人は？','いえの 人','しらない 人','テレビに でる 人','ともだちの ペット','そだてて くれた 人'],
+      ['うまれた ばかりの あかちゃんが のむ ものは？','ミルク（おちち）','カレー','ステーキ','おせんべい','まだ はが はえて いないよ'],
+      ['みずの なかの いきもので、まきがいの からを もって いるのは？','タニシ','メダカ','ドジョウ','おたまじゃくし','かいの なかま'],
+      ['メダカを かう とき、すいそうに いれると よい ものは？','みずくさ','さとう','せっけん','あぶら','メダカが たまごを うみつけるよ'],
+      ['小さく なった ふくや あそばなく なった おもちゃは？','ひつような 人に ゆずる','すぐ すてる','かわに すてる','かくして おく','まだ つかえる ものを だいじに'],
+      ['バスで せきを ゆずると よい 人は？','おとしよりや にんぷさん','げんきな ともだち','じぶんの かばん','だれにも ゆずらない','たって いるのが たいへんな 人'],
+      ['スズムシが なくのは どの きせつ？','あき','はる','なつの はじめ','ふゆ','おつきみの ころだよ'],
+      ['こうえんで あそんだ あとの ごみは？','もちかえる','おいて かえる','すなに うめる','いけに なげる','つぎに あそぶ 人の ことを かんがえよう'],
+      ['ひるまでも つきが みえる ことは ある？','ある','ぜったいに ない','よるしか でない','ふゆしか みえない','あおい そらを よく みて みよう'],
+      ['ミニトマトを しゅうかくする ときの みの いろは？','あか','みどり','くろ','しろ','うれると かわる いろ']
+    ]
+  },
+  rika:{
+    3:[
+      ['こん虫の 体は いくつの 部分に 分かれて いる？','3つ','2つ','4つ','6つ','頭から じゅんに 数えて みよう'],
+      ['こん虫の あしは 何本？','6本','4本','8本','10本','クモ（8本）より 少ないよ'],
+      ['こん虫の あしが ついて いる 部分は？','むね','頭','はら','せなか','体の まん中の 部分'],
+      ['クモは こん虫と いえる？','こん虫では ない','こん虫である','チョウの なかま','バッタの なかま','あしの 数を 思い出そう'],
+      ['モンシロチョウの 育つ じゅんは？','たまご→よう虫→さなぎ→せい虫','たまご→さなぎ→よう虫→せい虫','よう虫→たまご→さなぎ→せい虫','たまご→せい虫→よう虫→さなぎ','さいごに 羽の ある すがたに なるよ'],
+      ['さなぎに ならない こん虫は？','トンボ','チョウ','カブトムシ','テントウムシ','水の 中で「やご」として 育つよ'],
+      ['モンシロチョウが たまごを うむ 植物は？','キャベツ','ヒマワリ','イネ','マツ','よう虫の えさに なる 葉っぱ'],
+      ['植物の たねから さいしょに 出る 葉を 何と いう？','子葉','本葉','花びら','がく','2まいの ことが 多いよ'],
+      ['植物の 体で、地面の 下に ある 部分は？','根','葉','花','くき','水を すい上げる ところ'],
+      ['かげは、太陽の どちら がわに できる？','反対がわ','同じがわ','真上','どこにも できない','光が さえぎられる 向きを 考えよう'],
+      ['太陽が のぼる 方位は？','東','西','南','北','しずむ 方位の 反対'],
+      ['太陽が しずむ 方位は？','西','東','南','北','のぼる 方位の 反対'],
+      ['昼の 12時ごろ、太陽が ある 方位は？','南','北','東','西','いちばん 高く のぼる 方位'],
+      ['日なたと 日かげの 地面、あたたかいのは？','日なた','日かげ','同じ','夜だけ 日かげ','日光が 当たって いるのは どっち？'],
+      ['じしゃくに つく ものは？','鉄','アルミニウム','銅','紙','くぎや クリップの ざいりょう'],
+      ['じしゃくの N極と N極を 近づけると？','しりぞけ合う','引き合う','何も おきない','光る','同じ 極どうしは…'],
+      ['じしゃくの N極と S極を 近づけると？','引き合う','しりぞけ合う','何も おきない','あつく なる','ちがう 極どうしは…'],
+      ['かがみで はね返した 日光が 当たった ところは？','明るく あたたかく なる','暗く 冷たく なる','黒く なる','何も かわらない','光が とどくと どう なるかな'],
+      ['虫めがねで 日光を 小さく 集めると？','明るく あつく なる','暗く なる','冷たく なる','光が 消える','光を 1点に 集めて いるよ'],
+      ['豆電球に 明かりが つくのは？','わの ように つながって いる とき','導線が 1本 はずれて いる とき','電池が ない とき','ソケットが ない とき','電気の 通り道を「回路」と いうよ'],
+      ['電気を 通す ものは？','鉄の クリップ','わりばし','ゴム','プラスチックの じょうぎ','金ぞくで できて いる もの'],
+      ['音が 出て いる ものは どう なって いる？','ふるえて いる','止まって いる','冷たく なって いる','光って いる','たいこを さわって みよう'],
+      ['大きな 音が 出る とき、ものの ふるえは？','大きい','小さい','止まる','かわらない','強く たたくと…'],
+      ['ねん土の 形を かえると、重さは？','かわらない','重く なる','軽く なる','なくなる','ねん土の 量は かわって いないよ'],
+      ['同じ 体積の 鉄と 木、重いのは？','鉄','木','同じ','その日に よる','くぎと わりばしを 思い出そう'],
+      ['チョウの 口は どんな 形？','ストローの ような 形','はさみの ような 形','口は ない','ギザギザの 形','花の みつを すうよ'],
+      ['ショウリョウバッタが よく 見られる ところは？','草むら','水の 中','土の 深い 中','木の みきの 中','えさの 草が ある ところ'],
+      ['ホウセンカの 花が さいた あとに できる ものは？','実（たね）','根','子葉','さなぎ','つぎの 命の もと'],
+      ['風車に 強い 風を 当てると？','速く 回る','おそく 回る','止まる','反対に 回る','風の 力が 大きく なるよ'],
+      ['ゴムを 長く のばして はなすと、ゴムで 動く 車は？','遠くまで 進む','進まない','後ろに 進む','すぐ 止まる','ゴムが もとに もどろうと する 力']
+    ],
+    4:[
+      ['水が こおる 温度は？','0℃','10℃','50℃','100℃','冷とう庫の 中より 少し 高い 温度'],
+      ['水が ふっとうする 温度は？','約100℃','約50℃','約0℃','約200℃','やかんの お湯が ぐらぐら'],
+      ['水が こおると 体積は？','ふえる','へる','かわらない','なくなる','こおらせた ペットボトルを 思い出そう'],
+      ['空気を あたためると 体積は？','大きく なる','小さく なる','かわらない','なくなる','へこんだ ピンポン玉を お湯に 入れると…'],
+      ['金ぞくの ぼうの はしを 熱すると、熱は？','熱した ところから じゅんに 伝わる','全体が 一度に あたたまる','反対の はしから あたたまる','伝わらない','熱が「つたわって」いくよ'],
+      ['水を 下から 熱すると、あたためられた 水は？','上へ 動く','下へ 動く','動かない','消える','あたたかい 水は 軽く なるよ'],
+      ['ふっとうしなくても、水が 表面から 水じょう気に なって 出て いく ことを 何と いう？','じょう発','こおる こと','けっしょう','ろ過','せんたく物が かわくのも これ'],
+      ['晴れた 日、気温が 一番 高く なるのは？','午後2時ごろ','朝6時ごろ','夜12時ごろ','夕方6時ごろ','太陽が 一番 高い 時こくより 少し あと'],
+      ['晴れの 日と くもりの 日、1日の 気温の 変化が 大きいのは？','晴れの 日','くもりの 日','同じ','どちらも 変化しない','日光が よく 当たるのは どっち？'],
+      ['気温を はかる ときの 温度計の 高さは？','地面から 1.2〜1.5m','地面すれすれ','地面から 5m','地面に うめる','大人の 目の 高さ ぐらい'],
+      ['月の 形が かわって 見え、もとの 形に もどるまで 約何日？','約30日','約7日','約1年','約1日','カレンダー 1まい分'],
+      ['月は 1日の うちで どう 動いて 見える？','東から 南を 通って 西へ','西から 東へ','北から 南へ','動かない','太陽と 同じ 動き方'],
+      ['夏の 大三角を つくる 星では ないのは？','ベテルギウス','ベガ','アルタイル','デネブ','こと座・わし座・はくちょう座の 星で できて いるよ'],
+      ['星の 色について 正しいのは？','星に よって 色が ちがう','すべて 白','すべて 赤','すべて 青','さそり座の アンタレスは 赤っぽいよ'],
+      ['かん電池 2こを 直列に つなぐと、豆電球は 1この ときより？','明るく なる','暗く なる','つかない','同じ','電流が 大きく なるよ'],
+      ['かん電池 2こを へい列に つなぐと、明るさは 1この ときと くらべて？','ほぼ 同じ','とても 明るい','つかない','とても 暗い','電流の 大きさは ほとんど かわらない'],
+      ['電流の 向きを 反対に すると、モーターの 回る 向きは？','反対に なる','同じ','止まる','速く なる','かん電池の 向きを 逆に すると…'],
+      ['光電池に 当てる 光を 強く すると、モーターは？','速く 回る','おそく 回る','止まる','反対に 回る','光が 電気に かわるよ'],
+      ['ほねと ほねの つなぎ目で、体が 曲がる ところを 何と いう？','関節','筋肉','けっかん','つめ','ひじや ひざの ところ'],
+      ['うでを 曲げる とき、ちぢむのは？','筋肉','ほね','つめ','関節','力こぶが できる ところ'],
+      ['地面を 流れる 雨水は どう 流れる？','高い ところから 低い ところへ','低い ところから 高い ところへ','流れない','いつも 北へ','ボールが 転がる 向きと 同じ'],
+      ['水が しみこみやすいのは？','つぶの 大きい すな','つぶの 小さい 土','ねん土','アスファルト','すき間が 大きいのは どっち？'],
+      ['ツバメが 日本に やって くる きせつは？','春','秋','冬','1年中 いる','あたたかく なると やって くる わたり鳥'],
+      ['冬の ヒキガエルは どう して いる？','土の 中で 冬みんして いる','空を 飛んで いる','池を 泳ぎ回って いる','木に のぼって いる','じっと 春を 待つよ'],
+      ['冬の サクラの 木は どう なって いる？','葉が 落ち、芽が ついて いる','花が さいて いる','実が なって いる','かれて いる','春に そなえて いるよ'],
+      ['ヘチマの 実が 大きく 育つ きせつは？','夏から 秋','冬','春の はじめ','1年中','あつい きせつに よく 育つ'],
+      ['とじこめた 空気を おすと？','体積が 小さく なり、おし返す 力が 大きく なる','体積が 大きく なる','何も かわらない','空気が 消える','空気でっぽうを 思い出そう'],
+      ['とじこめた 水を おすと、体積は？','かわらない','小さく なる','大きく なる','消える','空気との ちがいだよ'],
+      ['温度計の 目もりを 読む ときの 目の 位置は？','えきの 先と 同じ 高さ','真上から','真下から','ななめ上から','目もりと まっすぐ 向かい合おう'],
+      ['北の 空で ほとんど 位置が かわらない 星は？','北極星','シリウス','ベガ','すばる','カシオペヤ座から さがせるよ']
+    ],
+    5:[
+      ['種子の 発芽に 必要では ない ものは？','肥料','水','空気','てきとうな 温度','発芽の 3つの 条件を 思い出そう'],
+      ['インゲンマメの 子葉に ふくまれる 養分は？','でんぷん','しぼう','ビタミン','塩','ヨウ素液で 色が かわるよ'],
+      ['ヨウ素液は でんぷんが あると 何色に なる？','青むらさき色','赤色','黄色','白色','ぶどうの ような 色'],
+      ['植物が よく 成長する ために、水と 温度の ほかに 必要な ものは？','日光と 肥料','暗い 場所','塩','砂糖','光と 栄養'],
+      ['メダカの おすの せびれの とくちょうは？','切れこみが ある','切れこみが ない','せびれが ない','とても 長い','せなかの ひれを よく 見よう'],
+      ['メダカの たまごが かえるまで、水温25℃で 約何日？','約11日','約1日','約2か月','約1年','1週間と 少し'],
+      ['人の 子どもが 母親の 体内で 育つ 期間は？','約38週','約10週','約20週','約52週','約9か月 ぐらい'],
+      ['母親の 体内で、子どもと たいばんを つなぐ ものは？','へそのお','ろっ骨','せぼね','い','おなかの まん中に あとが あるよ'],
+      ['子宮の 中で 子どもを しょうげきから 守る 液は？','羊水','血液','だ液','あせ','子どもが うかんで いる 液'],
+      ['花粉が めしべの 先に つく ことを 何と いう？','受粉','発芽','じょう発','消化','これが おこると 実が できるよ'],
+      ['アサガオの 花で、花粉を 作るのは？','おしべ','めしべ','がく','花びら','めしべの まわりに 何本も ある'],
+      ['日本付近の 天気は おおよそ どう 変わる？','西から 東へ','東から 西へ','南から 北へ','北から 南へ','雲は 上空の 西風に 運ばれる'],
+      ['台風が 日本に 多く 近づく きせつは？','夏から 秋','冬','春の はじめ','1年中 同じ','南の 海で 発生するよ'],
+      ['川の 曲がって いる ところで、流れが 速いのは？','外がわ','内がわ','どこも 同じ','流れは ない','カーブの 遠い ほう'],
+      ['流れる 水が 地面を けずる はたらきを 何と いう？','しん食','運ぱん','たい積','じょう発','ほかに 運ぱん・たい積が あるよ'],
+      ['山の 中を 流れる 川の 石の ようすは？','大きく 角ばって いる','小さく 丸い','すなだけ','石が ない','まだ あまり 流されて いないよ'],
+      ['水 100g に 食塩 10g を とかすと、全体の 重さは？','110g','100g','90g','10g','とけても 食塩は なくなって いないよ'],
+      ['水の 温度を 上げても、とける 量が ほとんど かわらないのは？','食塩','ミョウバン','ホウ酸','砂糖','料理に 使う しょっぱい もの'],
+      ['ふりこが 1往復する 時間を かえるのは？','ふりこの 長さ','おもりの 重さ','ふれはば','おもりの 色','ひもの 長さを かえて みよう'],
+      ['電磁石を 強く する 方法は？','コイルの まき数を ふやす','鉄しんを ぬく','電流を 小さく する','導線を 短く 切る','まく 回数に 注目'],
+      ['電磁石の N極と S極を 入れかえるには？','電流の 向きを 反対に する','コイルを 長く する','電池を 外す','鉄しんを 太く する','かん電池の 向きを かえて みよう'],
+      ['けんび鏡で、さいしょに 使う 倍率は？','一番 低い 倍率','一番 高い 倍率','どれでも よい','レンズは 使わない','広い はんいが 見える ほうから'],
+      ['ヘチマの 花の とくちょうは？','お花と め花が ある','お花だけ','め花だけ','花は さかない','2しゅるいの 花が さくよ'],
+      ['空全体の 雲の 量が 0〜8の ときの 天気は？','晴れ','くもり','雨','雪','雲が 少ないよ'],
+      ['空全体の 雲の 量が 9〜10の ときの 天気は？','くもり','晴れ','快晴','にじ','空が ほとんど 雲で おおわれて いる'],
+      ['こう水を ふせぐ ために、川の りょうがわに 作る ものは？','ていぼう','歩道橋','電柱','ベンチ','土を 高く もり上げて つくる'],
+      ['食塩水を 熱して 水を じょう発させると？','食塩が 出て くる','何も 残らない','水が ふえる','さとうが 出て くる','海水から 塩を とる 方法'],
+      ['ろ過で じょうごに しく 紙は？','ろ紙','画用紙','新聞紙','色紙','水だけを 通す 紙'],
+      ['メダカの えさの 量は？','食べ残しが 出ない くらい','できるだけ たくさん','1か月に 1回','あたえない','水が よごれない ように'],
+      ['たまごから かえった ばかりの メダカは、しばらく 何から 養分を とる？','はらの ふくろの 養分','ミジンコ','水草','日光','はらが ふくらんで いるよ']
+    ],
+    6:[
+      ['ものが 燃える ために 必要な 気体は？','酸素','ちっ素','二酸化炭素','水素','空気中に 約21％ ふくまれる'],
+      ['空気中に 一番 多く ふくまれる 気体は？','ちっ素','酸素','二酸化炭素','水じょう気','空気の 約78％'],
+      ['ろうそくが 燃えた あと、ふえる 気体は？','二酸化炭素','酸素','ちっ素','水素','石灰水を にごらせる 気体'],
+      ['石灰水に 二酸化炭素を 入れて ふると？','白く にごる','赤く なる','青く なる','何も おきない','牛乳の ような 色に なるよ'],
+      ['はく 息に、すう 空気より 多く ふくまれる 気体は？','二酸化炭素','酸素','ちっ素だけ','水素','体の 中で 使われた あとの 気体'],
+      ['だ液の はたらきで、でんぷんは？','べつの ものに 変わる','ふえる','かたく なる','赤く なる','ヨウ素液が 反応しなく なるよ'],
+      ['消化された 養分を 主に きゅうしゅうする ところは？','小腸','大腸','食道','肺','とても 長い 管'],
+      ['血液を 全身に 送り出す ところは？','心臓','肺','かん臓','じん臓','どきどき 動いて いるよ'],
+      ['肺の はたらきは？','酸素を 取り入れ、二酸化炭素を 出す','食べ物を 消化する','血液を 送り出す','にょうを つくる','呼吸に かかわるよ'],
+      ['根から 取り入れた 水は、主に どこから 出て いく？','葉の 気こう','根の 先','花びら','実','葉の うらに 小さな あなが あるよ'],
+      ['日光が 当たった 葉に できる 養分は？','でんぷん','しぼう','塩','鉄','ヨウ素液で 調べられるよ'],
+      ['「食べる・食べられる」の 関係の つながりを 何と いう？','食物れんさ','光合成','じょう発','消化','くさりの ように つながって いるよ'],
+      ['月の かがやいて 見える がわには 何が ある？','太陽','地球の かげ','北極星','火星','月は 自分では 光らないよ'],
+      ['満月の とき、月は どの 位置に ある？','地球を はさんで 太陽の 反対がわ','太陽と 地球の 間','太陽の すぐ 横','地球の 真上','夕方 東から のぼるよ'],
+      ['地層の 中から 見つかる、大昔の 生き物の あとを 何と いう？','化石','火山灰','れき','すな','アンモナイトや きょうりゅうの ほね'],
+      ['流れる 水の はたらきで できた 地層の つぶの 形は？','丸みが ある','角ばって いる','とがって いる','四角い','川を 流れる 間に けずられるよ'],
+      ['火山灰の つぶの 形は？','角ばって いる','丸い','とても やわらかい','液体','水に 流されて いないよ'],
+      ['てこで、ぼうを ささえる ところを 何と いう？','支点','力点','作用点','中心点','ほかに 力点・作用点が あるよ'],
+      ['てこで 重い ものを 小さな 力で 持ち上げるには、力点を？','支点から 遠く する','支点に 近く する','作用点に 重ねる','どこでも よい','長い ぼうを 使う 意味'],
+      ['手回し発電機を 速く 回すと？','電流が 大きく なる','電流が 小さく なる','電流が 流れない','反対向きに 流れる','回す 速さと 電気の 量の 関係'],
+      ['電気を ためる ことが できる ものは？','コンデンサー','豆電球','スイッチ','導線','ためて あとで 使えるよ'],
+      ['豆電球より 少ない 電気で 光る ものは？','発光ダイオード','電熱線','モーター','ブザー','LEDとも いうよ'],
+      ['青色リトマス紙を 赤く かえるのは？','酸性の 水よう液','アルカリ性の 水よう液','中性の 水よう液','ただの 水','塩酸や 酢'],
+      ['赤色リトマス紙を 青く かえるのは？','アルカリ性の 水よう液','酸性の 水よう液','中性の 水よう液','食塩水','アンモニア水や 石灰水'],
+      ['食塩水は 何性？','中性','酸性','アルカリ性','どれでも ない','リトマス紙の 色が どちらも かわらない'],
+      ['うすい 塩酸に アルミニウムを 入れると？','あわを 出して とける','何も おきない','かたく なる','大きく なる','金ぞくが 消えて いく ように 見える'],
+      ['炭酸水に とけて いる 気体は？','二酸化炭素','酸素','ちっ素','水素','「炭酸」の 名前に ヒント'],
+      ['地しんの ときに できる、大地の ずれを 何と いう？','断層','化石','地層','火山','ずれの 線が 地表に 見える ことも あるよ'],
+      ['人の 体で、にょうを つくる ところは？','じん臓','心臓','肺','い','せなかがわに 2つ ある'],
+      ['生き物が 呼吸で 使う 酸素を 出して いるのは？','植物','動物','石','雲','葉に 日光が 当たると…']
+    ]
+  },
+  shakai:{
+    3:[
+      ['地図で ふつう 上に なる 方位は？','北','南','東','西','方位じしんの 色の ついた はりが さす 方位'],
+      ['地図記号「文」が 表すのは？','小・中学校','ゆうびん局','病院','神社','勉強する ところ'],
+      ['〒の 形の 地図記号が 表すのは？','ゆうびん局','学校','交番','工場','手紙を 出す ところ'],
+      ['地図記号「卍」が 表すのは？','寺','神社','城あと','温泉','おぼうさんが いる ところ'],
+      ['鳥居の 形の 地図記号が 表すのは？','神社','寺','学校','図書館','お祭りや 初もうでに 行く ところ'],
+      ['地図記号「×」が 表すのは？','交番','消防署','病院','役所','おまわりさんが いる'],
+      ['地図記号「♨」が 表すのは？','温泉','工場','田','畑','湯気が 出て いるよ'],
+      ['火事の とき 電話する 番号は？','119','110','117','104','救急車も 同じ 番号'],
+      ['事故や 事件の とき 電話する 番号は？','110','119','117','177','けいさつに つながるよ'],
+      ['火事の ときに 消防車で 出動する 人は？','消防士','けいさつ官','医者','ゆうびん配たつ員','防火服を 着て いる'],
+      ['方位を 調べる 道具は？','方位じしん','ものさし','温度計','虫めがね','北を さす はりが あるよ'],
+      ['食品が いつまで おいしく 食べられるかを 表す ものは？','賞味期限','ねだん','産地','重さ','「〇年〇月〇日」と 書いて あるよ'],
+      ['品物が どこで 作られたかを 表す ものは？','産地','ねだん','バーコード','レシート','「〇〇県産」と 書いて ある'],
+      ['食品工場の 人が 白い 服や ぼうしを 身に つけるのは？','食品に かみの毛や ごみが 入らない ように','おしゃれの ため','寒い から','目立つ ため','清潔に する ため'],
+      ['農家が ビニールハウスを 使うのは？','寒い 時期でも 野菜を 育てる ため','雨水を ためる ため','動物を かう ため','車を とめる ため','中は あたたかいよ'],
+      ['通学路で 子どもを 見守って くれる 人たちは？','地いきの ボランティアの 人','消防士だけ','パイロット','宇宙飛行士','黄色い 旗を もって いる ことも'],
+      ['消火せんは 何に 使う？','火事の ときに 水を とる','ごみを すてる','手紙を 出す','車を とめる','消防士が ホースを つなぐ'],
+      ['市役所の 仕事は？','市の くらしを よく する 仕事','品物を 売る 仕事','病気を なおす 仕事','荷物を とどける 仕事','市長さんが いる ところ'],
+      ['昔、せんたくに 使った 道具は？','せんたく板','いろり','かまど','火ばち','ごしごし こする 板'],
+      ['昔の 家で、ごはんを たく ために 使ったのは？','かまど','せんたく板','ちゃぶ台','うちわ','まきを もやす'],
+      ['地図の しゅくしゃくは 何を 表す？','実さいの きょりを ちぢめた わりあい','土地の 高さ','気温','人口','ものさしの ような 目もり'],
+      ['田の 地図記号の もとに なったのは？','いねを かり取った あとの かぶ','くわ','水の 流れ','ふたば','秋の いねかりの あと'],
+      ['果樹園の 地図記号の もとは？','りんごなどの 実の 形','花','葉っぱ','木の 根','くだものの 木の 畑だよ'],
+      ['消防署の 地図記号の もとに なったのは？','昔の 火消しの 道具','はしご','ホース','けむり','昔、火を 消す ときに 使った 道具'],
+      ['4方位で、北の 反対は？','南','東','西','北東','太陽が 昼に ある 方位'],
+      ['東を 向いた とき、右手は どの 方位？','南','北','西','東','北を 向くと 右手は 東。そこから 右へ 90度 回ると？'],
+      ['店の 人の 工夫として あてはまるのは？','品物を 見やすく ならべる','ねだんを かくす','店を 暗く する','品物を へらす','買いやすく する 工夫'],
+      ['店が 牛乳パックや トレイを 集めるのは？','リサイクルの ため','売る ため','かざる ため','すてる ため','もう一度 しげんとして 使う'],
+      ['春、田に いねの なえを 植える 作業は？','田植え','いねかり','だっこく','雪かき','5月ごろに する 作業'],
+      ['いねかりを するのは どの きせつ？','秋','春','夏の はじめ','冬','実りの きせつ']
+    ],
+    4:[
+      ['日本の 都道府県の 数は？','47','43','50','45','1都1道2府43県'],
+      ['「府」が つく 2つの 府は？','大阪府と 京都府','東京府と 大阪府','北海府と 京都府','奈良府と 大阪府','どちらも 近畿地方'],
+      ['「道」が つく ところは？','北海道','東北道','九州道','四国道','一番 北に ある 大きな 島'],
+      ['日本の 首都が ある 都道府県は？','東京都','大阪府','京都府','神奈川県','「都」が つく ところ'],
+      ['川の 水を きれいに して 飲み水に する しせつは？','じょう水場','下水処理場','清そう工場','発電所','「水を きれいに する 場所」'],
+      ['使った 水を きれいに して 川や 海に もどす しせつは？','下水処理場','じょう水場','ダム','ちょ水池','トイレや 台所の 水が 流れて いく'],
+      ['もえる ごみを 処理する しせつは？','清そう工場','じょう水場','ダム','変電所','ごみを もやす 大きな えんとつ'],
+      ['3Rの「リユース」の 意味は？','くり返し 使う','ごみを もやす','分けずに すてる','たくさん 買う','「もう一度 使う」'],
+      ['森林が「緑のダム」と よばれる 理由は？','雨水を たくわえるから','木で ダムを 作るから','緑色の 水が 出るから','ダムの 近くに あるから','森の 土が スポンジの ように なって いる'],
+      ['地しんの とき、教室で まず する ことは？','つくえの 下に もぐって 頭を 守る','外へ 走り出す','エレベーターに のる','窓の そばに 行く','頭を 守るのが 第一'],
+      ['災害の きけんな 場所や ひなん場所を 表した 地図は？','ハザードマップ','天気図','路線図','グルメマップ','「ハザード」は「きけん」と いう 意味'],
+      ['電気を つくる しせつは？','発電所','じょう水場','清そう工場','消防署','水力・火力・太陽光などが ある'],
+      ['電気・ガス・水道など、くらしに 欠かせない ものを まとめて 何と いう？','ライフライン','フリーマーケット','インターネット','パスポート','「命の つな」と いう 意味'],
+      ['日本で 一番 面積が 大きい 都道府県は？','北海道','岩手県','東京都','長野県','日本の 一番 北'],
+      ['日本で 一番 面積が 小さい 都道府県は？','香川県','東京都','大阪府','沖縄県','四国に あるよ'],
+      ['海に 面して いない 県は？','長野県','静岡県','新潟県','千葉県','日本アルプスが ある 県'],
+      ['日本の 一番 南に ある 県は？','沖縄県','鹿児島県','宮崎県','高知県','たくさんの 島から なる'],
+      ['昔から 受けつがれた 技で 作られる 品物を 何と いう？','伝統的工芸品','電化製品','インスタント食品','プラスチック製品','職人さんが 手作業で 作る ことが 多い'],
+      ['ごみを 種類ごとに 分けて 出す ことを 何と いう？','分別','発電','運動','けんさ','もえる・もえない・しげんごみ…'],
+      ['かん電池などの きけんな ごみを 正しく 出す 理由は？','火事や けがを ふせぐ ため','重く する ため','早く もやす ため','色を かえる ため','安全の ため'],
+      ['川を せき止めて 水を ためる しせつは？','ダム','プール','工場','港','山の おくに ある 大きな かべ'],
+      ['近畿地方に ある 府県は？','大阪府','愛知県','福岡県','宮城県','たこ焼きで 有名'],
+      ['東北地方に ある 県は？','青森県','山口県','岐阜県','熊本県','りんごの 生産が さかん'],
+      ['九州地方に ある 県は？','福岡県','広島県','石川県','茨城県','九州で 一番 人口が 多い 県'],
+      ['中部地方に ある 県は？','愛知県','兵庫県','佐賀県','秋田県','名古屋市が ある'],
+      ['四国地方に ある 県は？','高知県','島根県','大分県','三重県','坂本龍馬の ふるさと'],
+      ['中国地方に ある 県は？','広島県','愛媛県','滋賀県','福井県','もみじまんじゅうが 有名'],
+      ['関東地方に ある 県は？','栃木県','山梨県','静岡県','長野県','日光東照宮が ある'],
+      ['119番の 電話を 受ける ところは？','消防の 通信指令室','学校','スーパー','銀行','すぐに 消防車や 救急車に 出動を 指令する'],
+      ['災害の とき、近所の 人どうしで 助け合う ことを 何と いう？','共助','自助','公助','休助','「共に」助け合う']
+    ],
+    5:[
+      ['日本で 一番 高い 山は？','富士山','北岳','浅間山','阿蘇山','高さ 3776m'],
+      ['日本で 一番 長い 川は？','信濃川','利根川','石狩川','最上川','新潟県から 日本海へ 流れる'],
+      ['日本で 一番 大きい 湖は？','琵琶湖','霞ヶ浦','十和田湖','諏訪湖','滋賀県に ある'],
+      ['日本で 一番 広い 平野は？','関東平野','石狩平野','濃尾平野','筑紫平野','首都の まわりに 広がる'],
+      ['日本の 国土の うち、山地は 約どのくらい？','約4分の3','約4分の1','約半分','約10分の1','平地より ずっと 多い'],
+      ['日本の 一番 北の はしの 島は？','択捉島','与那国島','沖ノ鳥島','南鳥島','北方領土の 一つ'],
+      ['日本の 一番 南の はしの 島は？','沖ノ鳥島','択捉島','南鳥島','与那国島','しずまない ように 護岸工事が されて いる 島'],
+      ['冬、日本海側で 雪が 多いのは なぜ？','北西の 季節風が しめった 空気を 運ぶから','南東の 季節風が ふくから','台風が 来るから','地しんが 多いから','冬の 季節風の 向き'],
+      ['夏に 太平洋側から ふく 季節風の 向きは？','南東','北西','北東','南西','冬と 反対の 向き'],
+      ['沖縄県の 家で、屋根がわらを しっくいで 固めるのは？','台風の 強い 風に そなえる ため','雪に そなえる ため','暑さを ためる ため','かざりの ため','南の 島に よく 来る 自然災害'],
+      ['北海道で さかんな、牛を 育てて 牛乳を 生産する 農業は？','らく農','稲作','果樹さいばい','養しょく','チーズや バターも 作る'],
+      ['米づくりで、5月ごろに 機械で なえを 植える 作業は？','田植え','いねかり','代かき','だっこく','なえを 田んぼへ'],
+      ['魚や 貝を いけすなどで 大きく なるまで 育てる 漁業は？','養しょく業','遠洋漁業','沖合漁業','沿岸漁業','のりや かきも これ'],
+      ['たまごから かえした 稚魚を 海に 放流して、大きく なってから とる 漁業は？','さいばい漁業','養しょく業','遠洋漁業','沖合漁業','とちゅうまで 育てて 海に 放す'],
+      ['自動車工場に 部品を とどける 工場を 何と いう？','関連工場','発電所','清そう工場','農場','大きな 工場の まわりに 集まって いる'],
+      ['自動車の 生産が 特に さかんな 県は？','愛知県','北海道','沖縄県','高知県','豊田市が ある'],
+      ['工業生産額が 一番 多い 工業地帯は？','中京工業地帯','京浜工業地帯','阪神工業地帯','北九州工業地帯','愛知県を 中心と する'],
+      ['日本の 食料自給率（カロリーベース）は 約何％？','約40％','約80％','約10％','約100％','半分より 少ない'],
+      ['新聞・テレビ・インターネットなど、情報を 伝える ものを 何と いう？','メディア','エネルギー','インフラ','リサイクル','「なかだち」と いう 意味の ことば'],
+      ['インターネットで 気を つける ことは？','個人情報を むやみに 書きこまない','知らない 人に すぐ 会う','パスワードを 人に 教える','うわさを 広める','名前や 住所を 守ろう'],
+      ['森林の はたらきとして 正しいのは？','空気を きれいに し、土しゃくずれを ふせぐ','雨を ふらせない','気温を 上げる','海の 水を へらす','木の 根が 土を ささえる'],
+      ['日本の 国土の うち、森林は 約どのくらい？','約3分の2','約3分の1','約10分の1','約10分の9','国土の 半分以上'],
+      ['四大公害病の 一つで、熊本県で おきたのは？','水俣病','イタイイタイ病','四日市ぜんそく','新潟水俣病','八代海に 面した 市の 名前'],
+      ['日本の 時こくの もとに なる 東経135度の 線が 通る 市は？','明石市','札幌市','那覇市','仙台市','兵庫県に ある 天文科学館'],
+      ['日本の 東がわに 広がる 海は？','太平洋','日本海','東シナ海','オホーツク海','世界で 一番 大きい 海'],
+      ['冬に 流氷が やって くる、北海道の 北東の 海は？','オホーツク海','東シナ海','瀬戸内海','日本海','北の 寒い 海'],
+      ['米の 生産が 特に さかんな 地方は？','東北地方・北陸地方','四国地方','沖縄','近畿地方','新潟県や 秋田県'],
+      ['りんごの 生産量が 一番 多い 県は？','青森県','沖縄県','高知県','鹿児島県','東北地方の 一番 北'],
+      ['みかんの 生産が さかんな 県は？','和歌山県','北海道','青森県','長野県','近畿地方の 南の あたたかい 県'],
+      ['日本の 国土の 面積は 約何万km²？','約38万km²','約3万km²','約100万km²','約10万km²','30万より 大きく 40万より 小さい']
+    ],
+    6:[
+      ['縄文時代の 人々が 食べた 貝の からなどを すてた あとを 何と いう？','貝塚','古墳','高床倉庫','竪穴住居','むかしの ごみすて場の あと'],
+      ['弥生時代に 広まり、くらしを 大きく かえた ことは？','米づくり','鉄道','ゆうびん','印刷','田んぼを つくり始めた'],
+      ['米を たくわえる ために 弥生時代に 作られた 倉庫は？','高床倉庫','竪穴住居','五重塔','天守閣','ねずみや しっけを ふせぐ 工夫'],
+      ['前方後円墳などの 大きな 墓が 作られた 時代は？','古墳時代','縄文時代','江戸時代','明治時代','王や 豪族の 力を 表して いる'],
+      ['十七条の憲法を つくった 人物は？','聖徳太子','中大兄皇子','聖武天皇','源頼朝','法隆寺を 建てた'],
+      ['奈良の 東大寺に 大仏を つくらせた 天皇は？','聖武天皇','天智天皇','桓武天皇','推古天皇','仏教の 力で 国を 守ろうと した'],
+      ['『源氏物語』を 書いた 人物は？','紫式部','清少納言','小野小町','卑弥呼','『枕草子』の 作者では ないよ'],
+      ['鎌倉幕府を 開いた 人物は？','源頼朝','足利尊氏','徳川家康','平清盛','弟の 義経と ともに 平氏と 戦った'],
+      ['鎌倉時代、元の 軍が 2度 せめて きた できごとを 何と いう？','元寇','応仁の乱','島原の乱','壬申の乱','九州北部に 上陸しようと した'],
+      ['京都に 金閣を 建てた 人物は？','足利義満','足利義政','織田信長','豊臣秀吉','室町幕府の 3代将軍'],
+      ['京都に 銀閣を 建てた 人物は？','足利義政','足利義満','徳川家光','聖徳太子','室町幕府の 8代将軍'],
+      ['長篠の戦いで 鉄砲を 有効に 使い、武田軍に 勝った 人物は？','織田信長','武田勝頼','上杉謙信','明智光秀','安土城を 建てた'],
+      ['検地や 刀狩を 行った 人物は？','豊臣秀吉','織田信長','徳川家康','足利義満','大阪城を 建てた'],
+      ['江戸幕府を 開いた 人物は？','徳川家康','徳川家光','豊臣秀吉','織田信長','関ヶ原の 戦いに 勝った'],
+      ['大名に 江戸と 領地を 1年おきに 行き来させた 制度は？','参勤交代','鎖国','刀狩','楽市・楽座','3代将軍 家光が 制度に した'],
+      ['1853年、黒船で 浦賀に 来た アメリカの 使節は？','ペリー','ザビエル','ハリス','マッカーサー','開国を せまった'],
+      ['明治政府が 藩を なくして 県を 置いた 改革は？','廃藩置県','大化の改新','版籍奉還','地租改正','1871年に 行われた'],
+      ['日本国憲法の 三つの 原則に ふくまれない ものは？','天皇主権','国民主権','基本的人権の尊重','平和主義','大日本帝国憲法の 考え方が まざって いるよ'],
+      ['日本国憲法が 施行された 5月3日は 何の 祝日？','憲法記念日','建国記念の日','文化の日','こどもの日','ゴールデンウィークの 一日'],
+      ['法律を つくる ところは？','国会','内閣','裁判所','市役所','衆議院と 参議院から なる'],
+      ['国会・内閣・裁判所が 役割を 分けて いる しくみを 何と いう？','三権分立','三原則','三審制','三大改革','たがいに 見はり合って いる しくみ'],
+      ['国会で 指名され、内閣の 長に なる 人は？','内閣総理大臣','天皇','最高裁判所長官','都道府県知事','首相とも いう'],
+      ['日本で 選挙権が ある 年れいは？','18歳以上','20歳以上','16歳以上','25歳以上','高校3年生の 年れい'],
+      ['国際連合の 本部が ある 都市は？','ニューヨーク','ロンドン','パリ','ジュネーブ','アメリカの 大都市'],
+      ['世界の 子どもたちを 支える 国連の 機関は？','ユニセフ','ユネスコ','国際オリンピック委員会','世界貿易機関','「国連児童基金」'],
+      ['1964年に 東京で 開かれた 国際的な 大会は？','オリンピック','万国博覧会','サミット','ワールドカップ','聖火リレーが あった'],
+      ['平安時代、むすめを 天皇の きさきに して 大きな 力を もった 人物は？','藤原道長','源頼朝','平清盛','聖徳太子','「この世をば わが世とぞ思ふ…」の 歌'],
+      ['卑弥呼が 治めた 国の 名前は？','邪馬台国','大和朝廷','百済','隋','中国の 歴史書に 書かれた 女王の 国'],
+      ['江戸時代、外国との 交流を 制限した 政策は？','鎖国','開国','参勤交代','楽市楽座','長崎の 出島で オランダ・中国とだけ 貿易'],
+      ['オランダ語の 医学書を ほんやくして『解体新書』を 出版した 人物は？','杉田玄白','本居宣長','伊能忠敬','歌川広重','前野良沢と いっしょに ほんやく']
+    ]
+  }
+};
+function bankQuestions(type, g, n){
+  return shuffle(QBANK[type][g]).slice(0,n).map(([q,a,w1,w2,w3,h])=>{
+    const o = mk(q, a, shuffle([a,w1,w2,w3]).map(v=>({html:v,key:v})), '', a, true, h);
+    o.type = type; return o;
+  });
+}
+
+/* ========= えいご =========
+   [英語, 日本語, 絵文字, なかま, (1・2年は カタカナ)] */
+const EIGO = {
+  1:[['dog','いぬ','🐶','animal','ドッグ'],['cat','ねこ','🐱','animal','キャット'],['bird','とり','🐦','animal','バード'],['fish','さかな','🐟','animal','フィッシュ'],['rabbit','うさぎ','🐰','animal','ラビット'],['bear','くま','🐻','animal','ベア'],
+      ['apple','りんご','🍎','food','アップル'],['banana','バナナ','🍌','food','バナナ'],['orange','オレンジ','🍊','food','オレンジ'],['milk','ぎゅうにゅう','🥛','food','ミルク'],['egg','たまご','🥚','food','エッグ'],['cake','ケーキ','🍰','food','ケーキ'],
+      ['red','あか','🔴','color','レッド'],['blue','あお','🔵','color','ブルー'],['yellow','きいろ','🟡','color','イエロー'],['green','みどり','🟢','color','グリーン'],
+      ['one','1','1️⃣','number','ワン'],['two','2','2️⃣','number','ツー'],['three','3','3️⃣','number','スリー'],['four','4','4️⃣','number','フォー'],['five','5','5️⃣','number','ファイブ'],
+      ['sun','たいよう','☀️','nature','サン'],['moon','つき','🌙','nature','ムーン'],['star','ほし','⭐','nature','スター'],['flower','はな','🌸','nature','フラワー'],
+      ['car','くるま','🚗','thing','カー'],['ball','ボール','⚽','thing','ボール'],['book','ほん','📖','thing','ブック'],['hat','ぼうし','👒','thing','ハット'],['bag','かばん','👜','thing','バッグ']],
+  2:[['lion','ライオン','🦁','animal','ライオン'],['elephant','ぞう','🐘','animal','エレファント'],['monkey','さる','🐵','animal','モンキー'],['pig','ぶた','🐷','animal','ピッグ'],['cow','うし','🐮','animal','カウ'],['frog','かえる','🐸','animal','フロッグ'],
+      ['grapes','ぶどう','🍇','food','グレープス'],['strawberry','いちご','🍓','food','ストロベリー'],['lemon','レモン','🍋','food','レモン'],['peach','もも','🍑','food','ピーチ'],['bread','パン','🍞','food','ブレッド'],['rice','ごはん','🍚','food','ライス'],
+      ['purple','むらさき','🟣','color','パープル'],['black','くろ','⚫','color','ブラック'],['white','しろ','⚪','color','ホワイト'],['brown','ちゃいろ','🟤','color','ブラウン'],
+      ['six','6','6️⃣','number','シックス'],['seven','7','7️⃣','number','セブン'],['eight','8','8️⃣','number','エイト'],['nine','9','9️⃣','number','ナイン'],['ten','10','🔟','number','テン'],
+      ['rain','あめ','🌧️','nature','レイン'],['snow','ゆき','❄️','nature','スノー'],['tree','き','🌳','nature','ツリー'],
+      ['bus','バス','🚌','thing','バス'],['train','でんしゃ','🚃','thing','トレイン'],['bike','じてんしゃ','🚲','thing','バイク'],['pencil','えんぴつ','✏️','thing','ペンシル'],
+      ['eye','め','👁️','body','アイ'],['hand','て','✋','body','ハンド']],
+  3:[['nose','はな（顔の）','👃','body'],['mouth','口','👄','body'],['ear','耳','👂','body'],['foot','足','🦶','body'],
+      ['sunny','晴れ','☀️','weather'],['rainy','雨','☔','weather'],['cloudy','くもり','☁️','weather'],['snowy','雪','⛄','weather'],
+      ['happy','うれしい','😊','feeling'],['sad','かなしい','😢','feeling'],['sleepy','ねむい','😪','feeling'],['angry','おこって いる','😠','feeling'],['hungry','おなかが すいた','🤤','feeling'],
+      ['soccer','サッカー','⚽','sport'],['baseball','野球','⚾','sport'],['tennis','テニス','🎾','sport'],['basketball','バスケットボール','🏀','sport'],['swimming','水泳','🏊','sport'],
+      ['triangle','三角','🔺','shape'],['square','四角','🟥','shape'],['heart','ハート','❤️','shape'],['star','星','⭐','shape'],
+      ['tiger','トラ','🐯','animal'],['panda','パンダ','🐼','animal'],['horse','馬','🐴','animal'],
+      ['melon','メロン','🍈','food'],['cherry','さくらんぼ','🍒','food'],['tomato','トマト','🍅','food'],['potato','じゃがいも','🥔','food'],['carrot','にんじん','🥕','food']],
+  4:[['Monday','月曜日','','day'],['Tuesday','火曜日','','day'],['Wednesday','水曜日','','day'],['Thursday','木曜日','','day'],['Friday','金曜日','','day'],['Saturday','土曜日','','day'],['Sunday','日曜日','','day'],
+      ['pen','ペン','🖊️','school'],['eraser','消しゴム','','school'],['ruler','じょうぎ','📏','school'],['notebook','ノート','📓','school'],['scissors','はさみ','✂️','school'],['glue','のり','','school'],
+      ['library','図書館','📚','place'],['classroom','教室','','place'],['gym','体育館','','place'],['playground','運動場','','place'],
+      ['morning','朝','🌅','time'],['night','夜','🌃','time'],['breakfast','朝ごはん','🍳','time'],['lunch','昼ごはん','🍱','time'],['dinner','夕ごはん','🍽️','time'],
+      ['eleven','11','','number'],['twelve','12','','number'],['twenty','20','','number'],['thirty','30','','number'],['hundred','100','💯','number'],
+      ['sing','歌う','🎤','verb'],['dance','おどる','💃','verb'],['clock','時計','⏰','school']],
+  5:[['Japanese','国語','','subject'],['math','算数','','subject'],['science','理科','🔬','subject'],['social studies','社会','','subject'],['English','英語','','subject'],['music','音楽','🎵','subject'],['P.E.','体育','','subject'],['arts and crafts','図画工作','🎨','subject'],
+      ['teacher','先生','🧑‍🏫','job'],['doctor','医者','🧑‍⚕️','job'],['cook','料理人','🧑‍🍳','job'],['pilot','パイロット','✈️','job'],['farmer','農家','🧑‍🌾','job'],['police officer','けいさつ官','👮','job'],['singer','歌手','🎤','job'],
+      ['January','1月','','month'],['April','4月','','month'],['July','7月','','month'],['August','8月','','month'],['December','12月','','month'],
+      ['play','（スポーツを）する','','verb'],['run','走る','🏃','verb'],['swim','泳ぐ','🏊','verb'],['eat','食べる','','verb'],['read','読む','📖','verb'],['write','書く','✍️','verb'],
+      ['birthday','たんじょう日','🎂','other'],['always','いつも','','other'],['sometimes','ときどき','','other'],['never','けっして〜ない','','other']],
+  6:[['hospital','病院','🏥','place'],['station','駅','🚉','place'],['park','公園','🏞️','place'],['post office','ゆうびん局','📮','place'],['museum','博物館','🏛️','place'],['zoo','動物園','','place'],['bookstore','本屋','','place'],['aquarium','水族館','🐠','place'],
+      ['summer vacation','夏休み','🏖️','event'],['school trip','修学旅行','','event'],['sports day','運動会','','event'],['graduation ceremony','卒業式','🎓','event'],
+      ['went','行った','','past'],['ate','食べた','','past'],['saw','見た','','past'],['enjoyed','楽しんだ','','past'],['played','遊んだ','','past'],
+      ['beautiful','美しい','','adj'],['delicious','おいしい','😋','adj'],['exciting','わくわくする','','adj'],['fun','楽しい','','adj'],['big','大きい','','adj'],
+      ['Japan','日本','🇯🇵','country'],['America','アメリカ','🇺🇸','country'],['China','中国','🇨🇳','country'],['Australia','オーストラリア','🇦🇺','country'],['France','フランス','🇫🇷','country'],['Brazil','ブラジル','🇧🇷','country'],
+      ['junior high school','中学校','','other'],['memory','思い出','','other']]
+};
+const EIGO_CAT = {animal:'どうぶつ',food:'たべもの',color:'いろ',number:'かず',nature:'しぜん',thing:'もの',body:'からだ',weather:'天気',feeling:'気持ち',sport:'スポーツ',shape:'形',
+  day:'曜日',school:'学校で 使う もの',place:'場所',time:'時間・食事',verb:'動作',subject:'教科',job:'しょくぎょう',month:'月',other:'その他',event:'行事',past:'過去の 動作',adj:'様子',country:'国'};
+const EIGO_SENT = {
+  5:[['I ＿＿ soccer.<br><small>（わたしは サッカーを します）</small>','play','eat','go','have','スポーツを「する」と いう ことば'],
+     ['What ＿＿ do you like?<br><small>（何の スポーツが すき？）</small>','sport','time','day','name','サッカーや テニスの なかま'],
+     ['When is your ＿＿?<br><small>（たんじょう日は いつ？）</small>','birthday','name','color','school','🎂の 日'],
+     ['I want to be a ＿＿.<br><small>（医者に なりたい）</small>','doctor','cook','pilot','singer','病院で はたらく 人'],
+     ['＿＿ is your name?<br><small>（あなたの 名前は 何？）</small>','What','Where','When','Who','「何」を たずねる ことば'],
+     ['I can ＿＿ fast.<br><small>（速く 走れます）</small>','run','eat','sing','read','🏃'],
+     ['Go ＿＿.<br><small>（まっすぐ 行って ください）</small>','straight','left','right','back','曲がらないで 進む'],
+     ['I have math ＿＿ Monday.<br><small>（月曜日に 算数が あります）</small>','on','in','at','to','曜日の 前に つく ことば'],
+     ['How ＿＿ is it?<br><small>（いくらですか）</small>','much','many','old','long','ねだんを たずねる'],
+     ['She is my ＿＿.<br><small>（かのじょは わたしの 姉です）</small>','sister','brother','father','uncle','女の きょうだい']],
+  6:[['I ＿＿ to Kyoto.<br><small>（京都へ 行きました）</small>','went','go','goes','going','go の 過去の 形'],
+     ['I ＿＿ sushi.<br><small>（すしを 食べました）</small>','ate','eat','eats','eating','eat の 過去の 形'],
+     ['It was ＿＿.<br><small>（とても 楽しかった）</small>','fun','sad','cold','sleepy','楽しい 気持ち'],
+     ['I want to ＿＿ the soccer team.<br><small>（サッカー部に 入りたい）</small>','join','eat','see','sing','「参加する」と いう 意味'],
+     ['I want to be a ＿＿.<br><small>（先生に なりたい）</small>','teacher','doctor','farmer','pilot','学校で 教える 人'],
+     ['My best memory is our ＿＿.<br><small>（いちばんの 思い出は 修学旅行です）</small>','school trip','sports day','birthday','summer','学年みんなで 遠くへ 出かける 行事'],
+     ['＿＿ do you live?<br><small>（どこに 住んで いますか）</small>','Where','What','When','How','場所を たずねる'],
+     ['We have a ＿＿ in our town.<br><small>（町には 公園が あります）</small>','park','station','hospital','zoo','すべり台や ベンチが ある'],
+     ['I ＿＿ the fireworks.<br><small>（花火を 見ました）</small>','saw','see','sees','seeing','see の 過去の 形'],
+     ['I like Japan. ＿＿ about you?<br><small>（あなたは どうですか）</small>','How','Who','Which','Why','「〜は どう？」と たずねる 決まった 言い方']]
+};
+function eigoQuestions(g, n){
+  const V = EIGO[g], kana = g<=2;
+  const pool = [];
+  V.forEach(w=>{
+    // ちがう 頭文字・ちがう なかまを まぜた まちがいの せんたくし
+    const pickWrong = (keyIdx)=>{
+      const same = shuffle(V.filter(x=>x!==w && x[3]===w[3] && x[keyIdx]!==w[keyIdx]));
+      const other = shuffle(V.filter(x=>x!==w && x[3]!==w[3] && x[keyIdx]!==w[keyIdx]));
+      const out=[]; const seen=new Set([w[keyIdx]]);
+      [...same.slice(0,1), ...other, ...same.slice(1)].forEach(x=>{ if(out.length<3 && !seen.has(x[keyIdx]) && (keyIdx!==0 || x[0][0].toLowerCase()!==w[0][0].toLowerCase() || out.length>=2)){ seen.add(x[keyIdx]); out.push(x);} });
+      [...same,...other].forEach(x=>{ if(out.length<3 && !seen.has(x[keyIdx])){ seen.add(x[keyIdx]); out.push(x);} });
+      return out;
+    };
+    const enHtml = x => kana ? `${x[0]}<small class="kana">${x[4]}</small>` : x[0];
+    // A：日本語 → 英語
+    const wa = pickWrong(0);
+    const qa = mk(`${w[2]?`<div class="emo-big">${w[2]}</div>`:''}「${w[1]}」${K('は えいごで？',g)}`, w[0],
+      shuffle([w,...wa]).map(x=>({html:enHtml(x), key:x[0]})), '', `${w[1]} ＝ ${w[0]}${kana?`（${w[4]}）`:''}`, true,
+      kana ? `「${w[4][0]}」から はじまる おとだよ` : `「${w[0][0]}」から はじまる ことばだよ`);
+    qa.wid=w[0]; pool.push(qa);
+    // B：英語 → 日本語
+    const wb = pickWrong(1);
+    const qb = mk(`<span class="en-big">${w[0]}</span>${kana?`<div class="kana-q">${w[4]}</div>`:''}<div>って なあに？</div>`, w[1],
+      shuffle([w,...wb]).map(x=>({html:x[1], key:x[1]})), '', `${w[0]} ＝ ${w[1]}`, true,
+      `${EIGO_CAT[w[3]]}の なかまだよ`);
+    qb.wid=w[0]; pool.push(qb);
+  });
+  (EIGO_SENT[g]||[]).forEach(([q,a,w1,w2,w3,h],i)=>{
+    const o = mk(`<span class="en-sent">${q}</span>`, a, shuffle([a,w1,w2,w3]).map(v=>({html:v,key:v})), '', a, true, h);
+    o.wid='s'+i; o.sent=true; pool.push(o);
+  });
+  // 同じ 単語が 2回 出ない ように えらぶ
+  const out=[], used=new Set();
+  for(const q of shuffle(pool)){ if(out.length>=n) break; if(used.has(q.wid)) continue; used.add(q.wid); q.type='eigo'; out.push(q); }
+  return out;
+}
+
+
+/* ========= ついか：せいかつ・理科・社会（各学年 +30問 → 60問） ========= */
+const QBANK_MORE = {
+  seikatsu:{
+    1:[
+      ['あさがおの つるは、ささえの ぼうに どう まきつく？','うえに むかって まきつく','したに むかって まきつく','まきつかない','よこに のびるだけ','おひさまの ほうへ のびるよ'],
+      ['あさがおの はなが しぼんだ あとに できる ものは？','たね','ねっこ','ふたば','つぼみ','つぎの としに まく ものだよ'],
+      ['がっこうで いちばん えらい せんせいは？','こうちょうせんせい','たんにんの せんせい','ようごの せんせい','おんがくの せんせい','ちょうれいで おはなしを するよ'],
+      ['しょくいんしつに はいる ときに いう ことばは？','しつれいします','いただきます','おやすみなさい','いってきます','ノックの あとに いう ことば'],
+      ['かいだんや ろうかでの きまりは？','はしらないで あるく','はしって いく','とびおりる','ふざけあう','ぶつかると あぶないよ'],
+      ['あめの ひに つかう ものは？','かさ','うちわ','サングラス','むぎわらぼうし','ぬれない ように さす もの'],
+      ['あつい ひに きを つける ことは？','みずを こまめに のむ','ずっと ひなたに いる','ぼうしを ぬぐ','のみものを がまんする','ねっちゅうしょうに ならない ように'],
+      ['どんぐりで つくれる おもちゃは？','やじろべえや こま','たこ','ふうせん','シャボンだま','くるくる まわるよ'],
+      ['おちばを ふむと する おとは？','カサカサ','ザーザー','ピカピカ','ゴロゴロ','かわいた おとだよ'],
+      ['ふゆの あさ、くさや つちに つく しろい こおりの つぶは？','しも','あめ','にじ','すな','ふむと さくっと おとが するよ'],
+      ['はるに さいて、あとで わたげに なる きいろい はなは？','たんぽぽ','ひまわり','あさがお','チューリップ','ふうっと ふくと とんで いくよ'],
+      ['チューリップは なにを うえて そだてる？','きゅうこん','たね','えだ','はっぱ','たまねぎの ような かたち'],
+      ['アリが ぎょうれつで はこんで いる ものは？','たべもの','いし','みず','すな','すに もって かえるよ'],
+      ['てんとうむしの せなかの もようは？','てんてん','しましま','チェック','もようは ない','なまえに ヒントが あるよ'],
+      ['うさぎの ながい みみは、なにに やくだつ？','おとを よく きく','そらを とぶ','たべものを つかむ','みずを のむ','みみの やくわりを かんがえよう'],
+      ['いきものの せわで だいじな ことは？','まいにち えさや みずを あげる','きが むいた ときだけ','ずっと さわりつづける','おおきな こえで よぶ','いのちを たいせつに'],
+      ['ブランコに のる ときの きまりは？','じゅんばんを まもる','たって こぐ','ふたりで のる','うしろに たつ','みんなの ものだよ'],
+      ['とまって いる くるまの うしろから とびだすと？','くるまから みえなくて あぶない','あんぜん','くるまが よけて くれる','はやく わたれる','うんてんしゅさんから みえるかな'],
+      ['よるに そとを あるく ときに つけると めだつ ものは？','はんしゃざい','くろい ふく','サングラス','マスク','ライトに あたると ひかるよ'],
+      ['かぞくの ために できる おてつだいは？','しょっきを はこぶ','おもちゃを ちらかす','テレビを みつづける','ごはんを のこす','ごはんの あとに できる こと'],
+      ['あさ おきたら いう あいさつは？','おはよう ございます','こんばんは','おやすみなさい','いただきます','1にちの はじめの あいさつ'],
+      ['「おやすみなさい」は いつ いう？','ねる まえ','あさ おきた とき','ごはんの まえ','でかける とき','ふとんに はいる ころ'],
+      ['ゆうがた、ひがしの そらから のぼって くる まるい つきを なんと いう？','まんげつ','みかづき','はんげつ','しんげつ','まんまるの つきだよ'],
+      ['プールに はいる まえに する ことは？','じゅんびたいそう','ひるね','おかしを たべる','はしりまわる','からだを ほぐそう'],
+      ['あきに「リーン リーン」と なく むしは？','すずむし','セミ','ちょうちょう','てんとうむし','くさむらで ほそい こえで なくよ'],
+      ['かいがらや どんぐりを あつめて できる ことは？','かざりや おもちゃを つくる','たべる','うみに すてる','みずに とかす','こうさくに つかえるよ'],
+      ['ゆきが たくさん ふった ひに つくれる ものは？','ゆきだるま','すなの おしろ','ひまわり','どろだんご','まるい ゆきを かさねるよ'],
+      ['ともだちの いえに あそびに いく ときは？','いえの ひとに いって から いく','だまって いく','よるに いく','かぎを かけずに いく','しんぱい させない ように'],
+      ['ほけんしつの せんせいを なんと いう？','ようごの せんせい','こうちょうせんせい','たんにんの せんせい','たいいくの せんせい','けがの てあてを して くれる'],
+      ['あさがおの はなが いちばん よく さく きせつは？','なつ','はる','あき','ふゆ','がっこうが ながい おやすみの ころに よく さくよ']
+    ],
+    2:[
+      ['サツマイモは どこに できる？','つちの なか','つるの さき','はなの なか','はっぱの うえ','ほりだして とるよ'],
+      ['ピーマンの みの いろ（ふつう）は？','みどり','むらさき','しろ','くろ','はっぱと にた いろ'],
+      ['やさいの なえを うえる とき、ねっこは？','つちを つけた まま そっと うえる','つちを ぜんぶ おとす','ねっこを きる','みずに つけるだけ','ねっこを いためない ように'],
+      ['えだまめは、なんの まめが わかい ときの もの？','だいず','あずき','そらまめ','えんどう','とうふや みそを つくる まめ'],
+      ['まちの としょかんで できる ことは？','本を かりる','でんしゃに のる','くすりを もらう','おかねを あずける','本が たくさん ある ばしょ'],
+      ['えきで はたらく 人は？','えきいん','のうか','りょうし','だいく','でんしゃの あんぜんを まもる'],
+      ['おかしを かう とき、レジで する ことは？','おかねを はらう','そのまま もちかえる','なまえを かく','うたを うたう','かいものの きまり'],
+      ['パンやさんが あさ はやく から はたらくのは？','おきゃくさんが くる まえに パンを やく ため','ねむいから','そうじだけ する ため','あそぶ ため','みせが あく じかんに まにあう ように'],
+      ['しょうぼうしょで はたらく 人は？','しょうぼうし','けいさつかん','かんごし','えきいん','あかい くるまに のる'],
+      ['のうかの 人が つくって いる ものは？','やさいや おこめ','くるま','本','ふく','はたけや たんぼで'],
+      ['カマキリの まえあしは どんな かたち？','かまの ような かたち','ひれの かたち','つばさの かたち','まるい かたち','えものを つかまえる'],
+      ['バッタが とおくへ とべるのは？','うしろあしが つよいから','はねが ないから','からだが おもいから','めが おおきいから','ジャンプの ひみつ'],
+      ['アゲハの ようちゅうが たべる はっぱは？','ミカンや サンショウの はっぱ','キャベツ','イネ','マツ','すっぱい くだものの き'],
+      ['ザリガニが にげる ときは どちらに すすむ？','うしろ','まえ','うえ','よこだけ','しっぽで みずを かくよ'],
+      ['オタマジャクシから カエルに なる とき、さいしょに はえるのは？','うしろあし','まえあし','はね','つの','しっぽの ちかくから'],
+      ['カエルに なると しっぽは どう なる？','なくなる','ながく なる','ふたつに なる','かわらない','りくに あがる ころに'],
+      ['ふうせんの くちを はなすと とんで いくのは？','くうきが いきおいよく でるから','ゴムが のびるから','おもいから','いろが きれいだから','ふうせんの くちから でる もの'],
+      ['かげえあそびで、かげが できる ところは？','ひかりの はんたいがわ','ひかりと おなじ がわ','どこにも できない','そらの うえ','ライトを あてて みよう'],
+      ['ストローの ふえを みじかく きると、おとは？','たかく なる','ひくく なる','でなく なる','かわらない','みじかい ほど…'],
+      ['じぶんの せいちょうを しる ために くらべると よい ものは？','あかちゃんの ときの しゃしん','ともだちの せいせき','テレビばんぐみ','てんきよほう','むかしの じぶんと いまの じぶん'],
+      ['からだが おおきく なった ことが わかる きろくは？','しんちょうの きろく','くつの いろ','すきな たべもの','ともだちの かず','せの たかさ'],
+      ['あたらしく 1ねんせいに なる 子に おしえて あげたい ことは？','がっこうの きまり','くるまの うんてん','りょうりの しかた','おとなの しごと','がっこうで こまらない ように'],
+      ['こうえんの みずのみばの つかいかたは？','つぎの 人の ために きれいに つかう','みずを だしっぱなしに する','あそびに つかう','ごみを いれる','みんなの もの'],
+      ['ゆうびんポストは なにいろ？','あか','あお','きいろ','みどり','しょうぼうしゃと おなじ いろ'],
+      ['てがみを おくる ときに ふうとうに はる ものは？','きって','シール','ばんそうこう','おふだ','ゆうびんの おかねの かわり'],
+      ['はっぴょうで だいじな ことは？','ききての ほうを みて はっきり はなす','ちいさい こえで はやく はなす','うしろを むく','かみを みないで ふざける','あいてに とどく ように'],
+      ['みずに いれると うかぶ どんぐりは？','むしに たべられて なかが からの ものが おおい','ぜんぶ しずむ','ぜんぶ うかぶ','とけて しまう','なかみが ないと かるいよ'],
+      ['なつに よく たべる、しましまの おおきな くだものは？','すいか','みかん','いちご','りんご','なかは あかいよ'],
+      ['ふゆに こたつで よく たべる くだものは？','みかん','すいか','もも','さくらんぼ','オレンジいろの くだもの'],
+      ['まちたんけんの あと、わかった ことを つたえる ほうほうは？','かべしんぶんや はっぴょう','ないしょに する','わすれる','すぐに すてる','みんなに しらせよう']
+    ]
+  },
+  rika:{
+    3:[
+      ['テントウムシの 育ち方は？','たまご→よう虫→さなぎ→せい虫','たまご→せい虫','たまご→よう虫→せい虫','さなぎ→たまご→せい虫','チョウと 同じ 育ち方'],
+      ['バッタの 育ち方で 正しいのは？','たまご→よう虫→せい虫','たまご→さなぎ→せい虫','さなぎから 生まれる','よう虫の すがたは ない','トンボと 同じ 育ち方'],
+      ['こん虫の 目や しょっ角が ついて いる 部分は？','頭','むね','はら','あし','体の 先の 部分'],
+      ['ダンゴムシは こん虫と いえる？','こん虫では ない','こん虫である','チョウの なかま','トンボの なかま','あしの 数を 数えて みよう'],
+      ['植物の くきの はたらきは？','体を ささえ、水の 通り道に なる','花びらを 作る','たねを 運ぶ','光を 出す','体の まん中の 部分'],
+      ['ヒマワリの 花が さいた あと できる ものは？','たくさんの たね','新しい 根','子葉','さなぎ','食べられる たねも あるよ'],
+      ['かげの 向きは、時間が たつと どう かわる？','西から 北、東へと 動く','かわらない','東から 西へ 動く','上下に 動く','太陽と 反対がわに 動くよ'],
+      ['朝と 昼で、日なたの 地面の 温度が 高いのは？','昼','朝','同じ','どちらも 0℃','日光が 長く 当たったのは？'],
+      ['かがみで はね返した 日光の 進み方は？','まっすぐ 進む','曲がりながら 進む','止まる','消える','光の 進み方の きまり'],
+      ['かがみ 3まいで はね返した 光を 重ねると、明るさは？','もっと 明るく なる','暗く なる','かわらない','消える','光が 集まると…'],
+      ['じしゃくの 力が 一番 強い ところは？','両はしの 極','まん中','どこも 同じ','力は ない','N極と S極の ところ'],
+      ['自由に 動ける じしゃくの N極は どちらを さす？','北','南','東','西','N は North の 頭文字'],
+      ['鉄の くぎを じしゃくで 同じ 向きに こすると？','くぎが じしゃくに なる','くぎが とける','くぎが 曲がる','くぎが 光る','くぎにも 極が できるよ'],
+      ['じしゃくと 鉄の 間に うすい 紙を はさむと？','紙を はさんでも 引きつける','引きつけなく なる','紙が もえる','紙が じしゃくに なる','うすい ものは 通りぬけるよ'],
+      ['かん電池の ＋極と －極を 導線だけで つなぐと？','あつく なって きけん','明るく なる','何も おきない','電池が ふえる','ショートと いうよ'],
+      ['スイッチの 役目は？','回路を つないだり 切ったり する','電気を ふやす','光を 出す','音を 出す','電気の 通り道を…'],
+      ['電気を 通さない ものは？','ガラス','アルミはく','10円玉','鉄くぎ','金ぞくでは ない もの'],
+      ['糸電話で 声が 伝わるのは？','糸が ふるえるから','糸が 光るから','糸が あつく なるから','糸が のびるから','音の 正体を 思い出そう'],
+      ['糸電話の 糸を 指で つまむと？','音が 聞こえなく なる','大きく 聞こえる','高く 聞こえる','かわらない','ふるえが 止まるよ'],
+      ['ものの 重さを はかる 道具は？','はかり','ものさし','温度計','方位じしん','g（グラム）で 表すよ'],
+      ['同じ 体積の アルミニウムと 鉄の 重さは？','ちがう','同じ','どちらも 0g','その日に よって かわる','ものの しゅるいで 重さが かわる'],
+      ['アルミニウムの 1円玉は じしゃくに つく？','つかない','つく','半分だけ つく','N極だけに つく','鉄では ないよ'],
+      ['チョウの はねは 何まい？','4まい','2まい','6まい','8まい','前と 後ろに 分かれて いるよ'],
+      ['こん虫の「はら」の とくちょうは？','いくつかの ふしが ある','あしが ついて いる','目が ある','しょっ角が ある','やわらかく 曲がる 部分'],
+      ['モンシロチョウの よう虫の 色は？','緑色','赤色','白色','黒色','キャベツの 葉に そっくり'],
+      ['さなぎの 間、こん虫は どう して いる？','ほとんど 動かず 何も 食べない','たくさん 食べる','とび回る','たまごを うむ','体の 中で 大へんしん中'],
+      ['こん虫の 体の むねに ついて いる ものは？','あしと はね','目と しょっ角','口','おしり','動く ための もの'],
+      ['ゴムを 2本に して 同じ ように のばすと、車は？','もっと 遠くまで 進む','近くで 止まる','進まない','後ろに 進む','ゴムの 力が 大きく なる'],
+      ['音の 大きさが 小さい とき、もののふるえは？','小さい','大きい','止まって いる','かわらない','そっと たたくと…'],
+      ['日なたと 日かげの 地面、しめって いるのは？','日かげ','日なた','どちらも かわいて いる','同じ','日光が 当たらないと かわきにくい']
+    ],
+    4:[
+      ['金ぞくを あたためると 体積は？','少し 大きく なる','小さく なる','かわらない','なくなる','鉄道の レールに すき間が ある わけ'],
+      ['空気を 冷やすと 体積は？','小さく なる','大きく なる','かわらない','ふえ続ける','ペットボトルを 冷やすと へこむよ'],
+      ['だんぼうで あたためた 部屋の 空気で、あたたかいのは？','天じょう近く','ゆか近く','どこも 同じ','外','あたたかい 空気は 上へ'],
+      ['ふっとうして いる 水から 出る あわの 正体は？','水じょう気','空気','酸素','二酸化炭素','水が すがたを かえた もの'],
+      ['湯気は 何が 冷やされて 見える ように なった もの？','水じょう気','けむり','ほこり','酸素','目に 見えない 気体が 小さな 水の つぶに'],
+      ['水が こおり始めてから 全部 こおるまでの 温度は？','0℃の まま かわらない','どんどん 下がる','上がる','100℃に なる','とちゅうで 温度が 止まるよ'],
+      ['水の すがたに ふくまれない ものは？','けむり','氷','水','水じょう気','固体・液体・気体'],
+      ['冷たい 水を 入れた コップの まわりに 水てきが つくのは？','空気中の 水じょう気が 冷やされたから','コップから しみ出たから','ガラスが とけたから','氷が われたから','空気の 中にも 水が ある'],
+      ['雨の 日の 1日の 気温の 変化は？','小さい','大きい','いつも 0℃','夜に 高く なる','日光が 当たらないから'],
+      ['百葉箱が 白く ぬられて いる わけは？','日光を はね返す ため','目立つ ため','雪に 合わせる ため','虫よけの ため','黒いと あたたまりやすい'],
+      ['満月が のぼって くる 方位は？','東','西','南','北','太陽が のぼる 方位と 同じ'],
+      ['星ざの 星の ならび方は、時間が たつと？','かわらない','かわる','ばらばらに なる','星が ふえる','形は そのままで 位置が 動く'],
+      ['オリオン座が よく 見える きせつは？','冬','夏','春だけ','見えない','寒い 夜空の 星ざ'],
+      ['1等星と 2等星、明るいのは？','1等星','2等星','同じ','どちらも 見えない','数が 小さい ほど 明るい'],
+      ['電流の 大きさや 向きを 調べる 道具は？','けん流計','温度計','方位じしん','てんびん','はりの ふれで わかる'],
+      ['光電池を 手で かくすと、モーターは？','止まる','速く 回る','反対に 回る','光る','光が 当たらないと…'],
+      ['のうを 守って いる ほねは？','頭の ほね','ろっ骨','せぼね','こしの ほね','かたい ヘルメットの ような ほね'],
+      ['心臓や 肺を かこんで 守って いる ほねは？','ろっ骨','頭の ほね','うでの ほね','足の ほね','かごの ような 形の ほね'],
+      ['関節が ない ところは？','頭の てっぺん','ひじ','ひざ','手首','曲がらない ところ'],
+      ['運動場で 水たまりが できやすいのは？','まわりより 低い ところ','高い ところ','山に なった ところ','かたむきの 上の 方','水は 低い ところへ'],
+      ['秋に なると サクラの 葉は？','色が かわって 落ちる','花が さく','大きく なる','緑が こく なる','すずしく なると…'],
+      ['オオカマキリは 冬を どんな すがたで こす？','たまご','せい虫','よう虫','さなぎ','あわの かたまりの 中で 春を 待つよ'],
+      ['夏の 昼、木で よく 鳴く こん虫は？','セミ','モンシロチョウ','テントウムシ','アリ','ミーンミーン'],
+      ['水を 熱して 水の 量が へったのは？','水じょう気に なって 出て いったから','氷に なったから','空気に とけたから','ビーカーに しみたから','見えない すがたに なったよ'],
+      ['空気でっぽうで 玉が とぶのは？','おしちぢめられた 空気が もとに もどろうと するから','水の 力','じしゃくの 力','電気の 力','空気の せいしつ'],
+      ['水を 熱する とき、ふっとう石を 入れるのは？','急に ふっとうするのを ふせぐ ため','色を つける ため','冷やす ため','早く こおらせる ため','安全の ため'],
+      ['半月から 満月に なるまで 約何日？','約7日','約1日','約30日','約3か月','1週間 ぐらい'],
+      ['夏の 大三角の デネブは 何座の 星？','はくちょう座','こと座','わし座','さそり座','白い 鳥の 星ざ'],
+      ['かん電池 1こと 2こ（直列）で、モーターが 速く 回るのは？','2こ（直列）','1こ','同じ','どちらも 回らない','電流が 大きい ほう'],
+      ['雨水が しみこみにくい 地面は？','つぶの 小さい 土','つぶの 大きい すな','じゃり','すき間の 多い 土','すき間が 小さい ほう']
+    ],
+    5:[
+      ['インゲンマメの 種子で、根・くき・葉に なる 部分は？','はい','子葉','種皮','花粉','子葉の 間に ある 小さな 部分'],
+      ['発芽の 条件を 調べる とき、調べる 条件 以外は どう する？','同じに する','全部 かえる','なくす','2つ かえる','くらべる ための きまり'],
+      ['メダカの おすの しりびれの 形は？','平行四辺形に 近い','後ろが 細い','切れこみが ある','ない','めすの しりびれは 後ろが 細いよ'],
+      ['けんび鏡で ピントを 合わせる とき、レンズと プレパラートは？','はなしながら 合わせる','近づけながら 合わせる','くっつけて おく','レンズを 外す','ぶつけて こわさない ように'],
+      ['池の 水の 中に いる 小さな 生き物は？','ミジンコ','メダカの たまご','ザリガニ','カエル','けんび鏡で 見る 小さな 生き物'],
+      ['人の 受精卵は 何が 合わさって できる？','卵と 精子','花粉と めしべ','子葉と はい','血液と 羊水','女性と 男性から'],
+      ['生まれる ときの 人の 赤ちゃんの 身長は 約何cm？','約50cm','約10cm','約100cm','約5cm','30cmの ものさし 2本より 少し 短い'],
+      ['たいばんの はたらきは？','母親から 養分を 受け取り、いらない ものを わたす','赤ちゃんを 冷やす','光を 出す','呼吸を 止める','へそのおで つながって いる'],
+      ['ヘチマの め花の 根もとに ある ものは？','ふくらみ（実に なる 部分）','おしべ','花粉','根','あとで 大きく なる ところ'],
+      ['花粉を 運ぶ ものは？','こん虫や 風','水道','電気','人の 声','ハチや チョウ'],
+      ['受粉しなかった め花は？','実が できない','大きな 実が できる','花が 長く さく','種が ふえる','受粉が 実の 条件'],
+      ['気象衛星の 雲画像で 白く 見えるのは？','雲','海','陸','道路','空から 写した 写真'],
+      ['台風の 中心付近の 天気は？','強い 風と 大雨','強い 日ざし','大雪','晴れて 寒い','大雨と 強風'],
+      ['日本付近の 台風の 進み方は？','はじめ 西や 北へ、その後 北東へ 進む ことが 多い','いつも 東へ','止まった まま','南へ 進む','日本付近で 向きが かわる'],
+      ['川の 曲がった ところの 内がわに できやすいのは？','川原（すなや 石が たまる）','がけ','深い ふち','たき','流れが ゆるやかな ところ'],
+      ['流れる 水が 土や 石を 運ぶ はたらきは？','運ぱん','しん食','たい積','じょう発','土や 石が 下流へ 移動する'],
+      ['流れが ゆるやかな ところで 土や 石が 積もる はたらきは？','たい積','しん食','運ぱん','ろ過','下流の 平らな ところ'],
+      ['下流の 石の 形は？','小さく 丸い','大きく 角ばって いる','とがって いる','石は ない','長い きょりを 流されて けずられた'],
+      ['大雨の とき、川の 水の 量と 流れの 速さは？','どちらも ふえる','どちらも へる','量だけ へる','かわらない','水の 力が 大きく なる'],
+      ['ミョウバンを とかした 水よう液を 冷やすと？','ミョウバンが 出て くる','何も おきない','水が ふえる','色が かわる','温度で とける 量が かわる'],
+      ['ものが 水に とけた 液の とくちょうは？','すき通って いる','かならず 白く にごる','かならず 色が ある','底に たまって いる','向こうが 見える'],
+      ['メスシリンダーの 目もりを 読む ときの 目の 高さは？','液面の へこんだ ところと 同じ','真上','真下','ななめ上','液面と 水平に'],
+      ['ふりこの おもりを 重く すると、1往復の 時間は？','かわらない','長く なる','短く なる','止まる','長さが 同じなら…'],
+      ['ふりこの 長さを 長く すると、1往復の 時間は？','長く なる','短く なる','かわらない','止まる','ブランコの くさりが 長いと…'],
+      ['電磁石から 鉄しんを ぬくと？','磁石の 力が 弱く なる','強く なる','かわらない','N極だけに なる','鉄しんの 役目'],
+      ['電磁石が ふつうの じしゃくと ちがう ところは？','電流を 止めると 磁石の 力が なくなる','N極が ない','鉄を 引きつけない','光る','スイッチで オン・オフ'],
+      ['電流計は 回路に どう つなぐ？','直列に つなぐ','へい列に つなぐ','電池に 直接 つなぐ','つながない','回路の とちゅうに 入れる'],
+      ['発芽して しばらく たち、しぼんだ 子葉に ヨウ素液を つけると？','あまり 色が かわらない','こい 青むらさき色','赤色','黄色く 光る','でんぷんは 成長に 使われた'],
+      ['雲の 正体は？','小さな 水や 氷の つぶ','けむり','すな','空気だけ','空の 上で 冷やされた 水じょう気'],
+      ['同じ 量の 水に とける 食塩の 量には 限りが ある？','ある','ない','温度が 低いと 無限に とける','かきまぜれば 無限に とける','とけ残りが 出るよ']
+    ],
+    6:[
+      ['ろうそくの ほのおで、一番 温度が 高いのは？','外えん','えん心','内えん','しん','空気と ふれやすい 部分'],
+      ['ふたを した びんの 中で ろうそくを 燃やすと？','やがて 火が 消える','ずっと 燃える','ほのおが 大きく なる','ほのおが 青く なる','酸素が へって いく'],
+      ['気体検知管で 調べられる ものは？','酸素や 二酸化炭素の わりあい','温度','重さ','色','気体の わりあい'],
+      ['木を 燃やした あとに 残る ものは？','灰','鉄','水だけ','何も 残らない','白っぽい こな'],
+      ['でんぷんの 液に だ液を 入れて あたためた あと、ヨウ素液を 入れると？','色が かわらない','青むらさき色に なる','赤く なる','黒く かたまる','でんぷんが なくなった'],
+      ['口から こう門までの 食べ物の 通り道を 何と いう？','消化管','血管','気管','神経','食道・胃・小腸・大腸'],
+      ['胃で 出る 消化液は？','胃液','だ液','たん汁','にょう','すっぱい 液だよ'],
+      ['小腸の 内がわの、養分を 吸収しやすく する つくりは？','じゅう毛','歯','肺ほう','ろっ骨','表面積を 広げる 小さな でっぱり'],
+      ['大腸の 主な はたらきは？','水分を 吸収する','でんぷんを 作る','血液を 送る','酸素を 取り入れる','便が かたく なる'],
+      ['かん臓の はたらきの 一つは？','養分を たくわえる','空気を 吸う','音を 聞く','食べ物を かむ','体の 中で 一番 大きな 臓器'],
+      ['手首で 感じられる 血管の 動きを 何と いう？','脈はく','呼吸','せき','くしゃみ','心臓の はく動が 伝わる'],
+      ['植物の 葉から 水が 水じょう気と して 出て いく ことを 何と いう？','蒸散','光合成','呼吸','消化','葉に ふくろを かぶせると 水てき'],
+      ['日光に 当てなかった 葉の でんぷんは？','ほとんど できない','たくさん できる','赤く なる','ふえる','光が 必要'],
+      ['食物れんさの はじまりと なる 生き物は？','植物','肉食動物','人','カビ','日光で 養分を 作る'],
+      ['夕方、南の 空に 見える 月の 形は？','右半分が 光る 半月','満月','三日月','新月','上げんの 月'],
+      ['新月の とき、月は どの 方向に ある？','太陽と 同じ 方向','太陽と 反対','地球の 北','月が 消える','光って いる 面が 地球から 見えない'],
+      ['地層が しま模様に 見えるのは？','つぶの 大きさや 色が ちがう 層が 重なって いるから','ペンキで ぬったから','木の 根','雨の あと','れき・すな・どろ'],
+      ['れき・すな・どろを 水に 入れて しずめると、一番 下に たまるのは？','れき','すな','どろ','どれも 同じ','つぶが 大きい ほど 早く しずむ'],
+      ['火山の ふん火で 流れ出る、高温で とけた 岩石は？','よう岩','化石','れき','どろ','真っ赤に 光って 流れる'],
+      ['てこを 利用した 道具は？','くぎぬき','ものさし','温度計','虫めがね','支点・力点・作用点が ある'],
+      ['てんびんが つり合う とき、左右で 等しいのは？','おもりの 重さ×支点からの きょり','おもりの 重さだけ','きょりだけ','おもりの 色','てこの きまり'],
+      ['はさみの 支点は どこ？','2まいの 刃を とめて いる ところ','指を 入れる ところ','紙を 切る 刃先','どこにも ない','ねじで とまって いる'],
+      ['電気を 熱に かえて 使う 道具は？','電気ストーブ','せん風機','ラジオ','LEDライト','あたたかく なる'],
+      ['電気を 運動に かえる ものは？','モーター','電熱線','豆電球','コンデンサー','くるくる 回る'],
+      ['同じ 長さの 電熱線で、太い ほうの 発熱は？','大きく なる','小さく なる','かわらない','ゼロに なる','電流が 流れやすい'],
+      ['塩酸に 鉄を とかした 液を じょう発させると 出て くるのは？','もとの 鉄とは ちがう もの','もとの 鉄','何も 出ない','食塩','せいしつが かわって いるよ'],
+      ['BTB液は 酸性で 何色？','黄色','青色','緑色','赤色','中性は 緑、アルカリ性は 青'],
+      ['人の 体で、空気の 通り道と なる 管は？','気管','食道','血管','小腸','のどから 肺へ'],
+      ['肺で、酸素を 血液に 取り入れる 小さな ふくろを 何と いう？','肺ほう','じゅう毛','胃','じん臓','ぶどうの ふさの ような つくり'],
+      ['地震で 土地が もり上がったり しずんだり する ことは ある？','ある','ない','海だけで おきる','山だけで おきる','断層が ずれると…']
+    ]
+  },
+  shakai:{
+    3:[
+      ['図書館の 地図記号は 何の 形？','本を 開いた 形','電話','とびら','家','読む ものの 形'],
+      ['博物館の 地図記号は 何の 形？','建物の 形','本','歯車','木','れきしの 品物を 展示する 建物'],
+      ['老人ホームの 地図記号は 何の 形？','家と つえ','歯車','鳥居','本','お年寄りが 使う もの'],
+      ['工場の 地図記号は 何の 形？','歯車','本','木','〒','機械の 部品'],
+      ['広葉樹林の 地図記号は？','丸い 木の 形','とがった 木の 形','歯車','本','葉が 広い 木'],
+      ['八方位で、北と 東の 間は？','北東','北西','南東','南西','2つの 方位を 合わせる'],
+      ['スーパーの チラシに のって いるのは？','安売りの 品物','学校の 時間わり','天気よほう','電車の 時こく','買い物客を 集める ため'],
+      ['品物の ねだんを 読み取る しましまの 線は？','バーコード','地図記号','郵便番号','電話番号','レジで ピッと 読む'],
+      ['外国から 運ばれて きた 品物を 何と いう？','輸入品','地元産','手作り品','伝統品','海の 向こうから'],
+      ['コンビニエンスストアの とくちょうは？','長い 時間 開いて いる','夜は 必ず しまる','肉しか 売らない','品物が ない','24時間 開いて いる 店も 多い'],
+      ['工場で、ベルトコンベアで 運びながら 分たんして 作る 方法は？','流れ作業','手作業だけ','休けい','見学','次々と 運ばれて くる'],
+      ['工場で 作られた 品物は どこへ 運ばれる？','店や 全国','工場の 中だけ','海に すてる','山の 中','トラックで 運ぶ'],
+      ['農家が 野菜を 出荷する 先の 一つは？','市場','消防署','学校','交番','野菜が 集まって 売り買いされる ところ'],
+      ['消防士が 出動しない 日も して いる ことは？','訓練や 点検','ずっと ねて いる','旅行','買い物','いつでも 出動できる ように'],
+      ['交通事故を ふせぐ ための しせつは？','ガードレールや 信号','すべり台','ベンチ','ふん水','歩行者を 守る'],
+      ['けいさつ官が 町を 見回る ことを 何と いう？','パトロール','消火','配たつ','しんさつ','パトカーで 回る ことも'],
+      ['「こども110番の家」とは？','こまった とき 助けを もとめられる 家','けいさつしょの 名前','110番を かける 家','交番の 一つ','ステッカーが はって ある 家'],
+      ['昔、部屋を あたためた 道具は？','火ばち','せんたく板','せんたく機','れいぞうこ','中に 炭を 入れた'],
+      ['昔の あかりに 使われた ものは？','ランプや ろうそく','LED','けいたい電話','テレビ','火を ともして 明るく した'],
+      ['地図で 土地の 高い ところを 表す ことが 多い 色は？','茶色','青','白','水色','山の 色'],
+      ['駅の まわりに 多い ものは？','店や ビル','田んぼだけ','森だけ','牧場','人が 多く 集まる'],
+      ['地いきの お祭りの 役わりは？','地いきの 人の つながりを 深める','ごみを ふやす','車を へらす','雨を ふらせる','みんなで 楽しむ'],
+      ['田に 水を 引く ための 水の 通り道は？','用水路','高速道路','線路','地下鉄','田んぼの 横に 流れる'],
+      ['畑の 地図記号の もとに なったのは？','植物の ふたば','いねの かぶ','くだもの','茶の 実','芽が 出た すがた'],
+      ['市役所の 仕事で ない ものは？','火事の 消火','住民の 届け出の 受付','道路や 公園の 計画','ごみの 収集の 計画','それぞれ どこの 仕事か 考えよう'],
+      ['方位じしんの はりの 色が ついた 方は 何を さす？','北','南','東','西','地図の 上と 同じ'],
+      ['市の 中で 土地が 低く 平らな ところに 多い ものは？','田や 住宅地','スキー場','ダム','山小屋','水を 引きやすい'],
+      ['昔の 人が 使った「七輪」は 何に 使った？','魚を やく など 料理','せんたく','そうじ','明かり','炭を 入れて 火を おこす'],
+      ['店で レジぶくろを 使わない ために もって いく ものは？','マイバッグ','かさ','さいふだけ','ぼうし','エコバッグとも いう'],
+      ['救急車が 来るまでに できる こと として 学校で 習うのは？','大人を よぶ','見ないふりを する','その場から にげる','写真を とる','まず まわりに 知らせよう']
+    ],
+    4:[
+      ['じょう水場で きれいに した 水を 一時 ためて おく しせつは？','配水池','下水処理場','清そう工場','プール','家庭に 送る 前に ためて おく'],
+      ['水を むだに しない 行動は？','歯みがきの とき 水を 止める','水を 出しっぱなしに する','おふろの 水を 毎回 すてる','雨の 日に 水やり','節水'],
+      ['空きかんや ペットボトルを 回収して 原料に もどす ことは？','リサイクル','リデュース','リユース','ポイすて','しげんに もどす'],
+      ['3Rの「リデュース」の 意味は？','ごみを へらす','くり返し 使う','しげんに もどす','たくさん すてる','マイバッグを もつのも これ'],
+      ['清そう工場で ごみを 燃やした 熱で つくる ものは？','電気','水','紙','くつ','熱を 利用する'],
+      ['ごみを 燃やした あとの 灰は どう なる？','うめ立て地へ 運ばれる','川に 流す','山に まく','空に とばす','処分場へ'],
+      ['大雨の とき、川の 近くで 心配な 災害は？','こう水','ふん火','雪なだれ','落雷','川の 水が あふれる'],
+      ['大きな 地しんの あと、海の 近くで 心配な 災害は？','津波','こう水','落雷','大雪','大きな 波が おしよせる'],
+      ['ひなん所として よく 使われる 場所は？','学校の 体育館','デパートの 屋上','川原','海岸','地いきで 決められた 公共の 建物'],
+      ['災害に そなえて 家に 用意して おく ものは？','水や 食料','花火','ゲーム','ジュースだけ','非常持ち出しぶくろ'],
+      ['地いきの 発展に つくした 昔の 人を 何と いう？','先人','観光客','転校生','有名人','昔の 人の くふうや 努力'],
+      ['日本を 地方に 分ける とき、ふつう いくつに 分ける？','8つ','3つ','12','20','北海道から 九州まで 数えて みよう'],
+      ['日本で 一番 人口が 多い 都道府県は？','東京都','大阪府','北海道','愛知県','首都'],
+      ['北海道の 道庁所在地は？','札幌市','函館市','旭川市','釧路市','雪まつりで 有名'],
+      ['宮城県の 県庁所在地は？','仙台市','宮城市','盛岡市','山形市','東北地方で 一番 大きな 都市'],
+      ['愛媛県の 県庁所在地は？','松山市','愛媛市','高松市','徳島市','道後温泉が ある'],
+      ['石川県の 県庁所在地は？','金沢市','石川市','富山市','福井市','兼六園が ある'],
+      ['神奈川県の 県庁所在地は？','横浜市','神奈川市','川崎市','千葉市','中華街が ある 港町'],
+      ['兵庫県の 県庁所在地は？','神戸市','兵庫市','姫路市','大阪市','港町で 有名'],
+      ['群馬県の 県庁所在地は？','前橋市','群馬市','高崎市','宇都宮市','「ま」で 始まる'],
+      ['沖縄県の 県庁所在地は？','那覇市','沖縄市','鹿児島市','石垣市','首里城が ある'],
+      ['茨城県の 県庁所在地は？','水戸市','茨城市','つくば市','宇都宮市','納豆で 有名'],
+      ['太陽の 光を 使って 電気を つくる 方法は？','太陽光発電','火力発電','原子力発電','水力発電','パネルを ならべて つくる'],
+      ['ダムの 水を 落とす 力で 電気を つくるのは？','水力発電','火力発電','風力発電','太陽光発電','水の 力'],
+      ['下水道が なかった 時代に こまった ことは？','よごれた 水で 病気が 広がった','水が ありすぎた','電気が なかった','雨が ふらなかった','衛生の 問題'],
+      ['石川県の 伝統的工芸品は？','輪島ぬり','南部鉄器','博多人形','有田焼','うるしで ぬった おわんや はし'],
+      ['消防団とは？','地いきの 人で つくる 消防の 組織','プロの 消防士だけ','けいさつの 一部','学校の クラブ','ふだんは べつの 仕事を して いる 人たち'],
+      ['47都道府県で「県」の 数は？','43','47','40','45','都・道・府を のぞくと'],
+      ['日本で 一番 北に ある 都道府県は？','北海道','青森県','岩手県','秋田県','日本で 一番 面積が 大きい'],
+      ['ごみを へらす ために、つめかえ用の 品物を 選ぶ ことは 3Rの どれ？','リデュース','リサイクル','リユース','どれでも ない','ごみの 量を 少なく する']
+    ],
+    5:[
+      ['日本の 4つの 大きな 島で、一番 大きいのは？','本州','北海道','九州','四国','東京が ある 島'],
+      ['赤道を 0度と して、南北の 位置を 表す ものは？','緯度','経度','標高','面積','北緯・南緯'],
+      ['ロンドンを 通る 線を 0度と して、東西の 位置を 表す ものは？','経度','緯度','時差','高度','東経・西経'],
+      ['日本海を はさんで 日本の 西に ある 国は？','韓国','オーストラリア','アメリカ','ブラジル','首都は ソウル'],
+      ['1年を 通じて 雨が 少なく、夏と 冬の 気温差が 大きい 気候は？','中央高地の 気候','南西諸島の 気候','日本海側の 気候','太平洋側の 気候','長野県など 山に かこまれた 地いき'],
+      ['さとうきびの 生産が さかんな 県は？','沖縄県','北海道','青森県','長野県','南の あたたかい 島'],
+      ['長野県の 高原で、夏の すずしさを 生かして 作る 野菜は？','レタスや キャベツ','さとうきび','みかん','パイナップル','高原野菜'],
+      ['米づくりで、田に 水を 入れて 土を 平らに する 作業は？','代かき','田植え','いねかり','だっこく','田植えの 前に する'],
+      ['米の 品種改良で 目指す ことは？','おいしく 寒さや 病気に 強い 米','高い ねだんの 米だけ','色の ついた 米','大きな つぶだけ','よい 性質を 組み合わせる'],
+      ['遠くの 海で 何か月も かけて 行う 漁業は？','遠洋漁業','沿岸漁業','養しょく業','さいばい漁業','大きな 船で 世界の 海へ'],
+      ['寒流と 暖流が ぶつかる ところを 何と いう？','潮目','海流','湾','岬','魚が 多く 集まる'],
+      ['日本の 太平洋側を 流れる 暖流は？','黒潮（日本海流）','親潮（千島海流）','リマン海流','南極海流','南から 流れて くる あたたかい 海流'],
+      ['自動車工場で、鉄板を 型で 打ちぬいて ドアなどの 形に する 工程は？','プレス','ようせつ','とそう','検査','大きな 機械で 形を 作る'],
+      ['自動車工場で 車体に 色を ぬる 工程は？','とそう','プレス','ようせつ','組み立て','ペンキを ふきつける'],
+      ['関東から 九州北部の 海ぞいに 工業地帯が 帯の ように 広がる 地いきは？','太平洋ベルト','中央高地','日本アルプス','南西諸島','帯の ように 広がる'],
+      ['日本が 輸入に たよって いる 燃料は？','石油','米','自動車','カメラ','中東の 国々から'],
+      ['中小工場の とくちょうは？','すぐれた 技術を もつ 工場が 多い','かならず 大工場より 大きい','外国に しか ない','機械を 使わない','働く 人が 300人より 少ない 工場'],
+      ['ニュース番組を 作る とき、大切に して いる ことは？','正確な 情報を 早く 伝える','おもしろい うわさを 広める','取材を しない','自分の 意見だけ 伝える','まちがいの ない ように'],
+      ['たくさんの 情報を 集めて 活用する、ネット通販などで 使われる ものは？','ビッグデータ','手紙','黒板','そろばん','大量の 情報'],
+      ['緊急地震速報は 何を 知らせる？','強い ゆれが 来る ことを 前もって','天気の 変化','電車の 時こく','火事の 場所','ゆれの 前に 知らせる'],
+      ['森林を 育てる ために、木の 一部を 切って 間を あける 作業は？','間ばつ','植林','下草がり','えだ打ち','日光が 地面まで とどく ように'],
+      ['人が 植えて 育てた 森を 何と いう？','人工林','天然林','熱帯林','竹林','すぎや ひのき'],
+      ['青森県と 秋田県に またがる 世界自然遺産は？','白神山地','知床','屋久島','小笠原諸島','ブナの 原生林'],
+      ['1967年に つくられた、公害を ふせぐ ための 法律は？','公害対策基本法','日本国憲法','道路交通法','消防法','公害を なくす ための 最初の 大きな 法律'],
+      ['大気の よごれが 原因と なった 公害病は？','四日市ぜんそく','水俣病','イタイイタイ病','新潟水俣病','三重県の 工場地帯'],
+      ['富山県で おきた 公害病は？','イタイイタイ病','水俣病','四日市ぜんそく','新潟水俣病','神通川の 流域'],
+      ['日本の 西の はしの 島は？','与那国島','択捉島','南鳥島','沖ノ鳥島','沖縄県に ある 島'],
+      ['日本の 東の はしの 島は？','南鳥島','与那国島','択捉島','沖ノ鳥島','マーカス島とも よばれる'],
+      ['日本の 輸出品で 金額が 大きい 工業製品は？','自動車','米','木材','石油','港から 船で 世界へ'],
+      ['火山の 熱を 利用して 電気を つくる 方法は？','地熱発電','水力発電','風力発電','太陽光発電','地下の 熱い 蒸気を 使う']
+    ],
+    6:[
+      ['縄文時代に 使われた、なわの 模様が ついた 土器は？','縄文土器','弥生土器','はにわ','銅たく','時代の 名前の もと'],
+      ['佐賀県に ある、弥生時代の 大きな むらの あとは？','吉野ヶ里遺跡','三内丸山遺跡','登呂遺跡','大森貝塚','ほりや さくで かこまれた むら'],
+      ['青森県に ある、縄文時代の 大きな 集落の あとは？','三内丸山遺跡','吉野ヶ里遺跡','登呂遺跡','岩宿遺跡','大きな 柱の あとが ある'],
+      ['古墳の まわりに ならべられた 土の 焼き物は？','はにわ','土偶','銅鏡','鉄砲','人や 馬の 形も ある'],
+      ['大和朝廷の 中心と なった 王を 何と いう？','大王','将軍','執権','関白','のちの 天皇'],
+      ['聖徳太子が、家がらに 関係なく 有能な 人を 役人に した 制度は？','冠位十二階','参勤交代','楽市楽座','廃藩置県','かんむりの 色で 位を 表した'],
+      ['聖徳太子が 中国（隋）に 送った 使者を 何と いう？','遣隋使','遣唐使','防人','朝鮮通信使','小野妹子が 有名'],
+      ['中大兄皇子と 中臣鎌足が 始めた 政治の 改革は？','大化の改新','明治維新','建武の新政','享保の改革','645年'],
+      ['奈良時代の 都は？','平城京','平安京','藤原京','鎌倉','奈良市に あった'],
+      ['唐から 来日し、唐招提寺を 開いた 僧は？','鑑真','行基','空海','最澄','何度も 失敗して 日本へ わたった'],
+      ['平安時代に 漢字を もとに 作られた 日本の 文字は？','かな文字','ローマ字','アルファベット','点字','ひらがなや かたかな'],
+      ['平安時代の 貴族の 屋しきの つくりを 何と いう？','寝殿造','書院造','高床倉庫','竪穴住居','池や 庭が ある 広い 屋しき'],
+      ['室町時代に 生まれ、今の 和室の もとに なった 建物の つくりは？','書院造','寝殿造','合掌造','校倉造','たたみや ふすま、床の間'],
+      ['室町時代に 雪舟が 大成させた 絵は？','水墨画','浮世絵','油絵','ふすま絵','すみの こさで 表す'],
+      ['源義経が 活やくし、平氏が ほろんだ 戦いは？','壇ノ浦の戦い','関ヶ原の戦い','長篠の戦い','桶狭間の戦い','山口県の 海で'],
+      ['鎌倉幕府と 御家人の 関係を 表す ことばは？','ご恩と 奉公','三権分立','四民平等','富国強兵','土地を 守って もらう かわりに 戦う'],
+      ['1549年に 日本に キリスト教を 伝えた 人物は？','ザビエル','ペリー','鑑真','ハリス','スペイン生まれの 宣教師'],
+      ['1543年に 種子島に 伝わった ものは？','鉄砲','仏教','漢字','米づくり','ポルトガル人が 伝えた'],
+      ['全国を 歩いて 正確な 日本地図を 作った 人物は？','伊能忠敬','杉田玄白','本居宣長','歌川広重','50才を すぎてから 測量を 始めた'],
+      ['「東海道五十三次」を えがいた 浮世絵師は？','歌川広重','葛飾北斎','近松門左衛門','松尾芭蕉','宿場町の 風景'],
+      ['『おくのほそ道』を 書いた 俳人は？','松尾芭蕉','近松門左衛門','本居宣長','杉田玄白','東北地方を 旅した'],
+      ['江戸幕府が たおれ、新しい 政府の もとで 進められた 改革は？','明治維新','大化の改新','享保の改革','建武の新政','1868年ごろ'],
+      ['明治政府が 進めた、産業を さかんに し 軍隊を 強く する 政策は？','富国強兵','鎖国','参勤交代','楽市楽座','四字熟語だよ'],
+      ['『学問のすゝめ』を 書いた 人物は？','福沢諭吉','野口英世','夏目漱石','板垣退助','慶應義塾を 開いた'],
+      ['国会を 開く ことを 求めた 自由民権運動の 中心人物は？','板垣退助','伊藤博文','大久保利通','西郷隆盛','自由党を つくった'],
+      ['初代 内閣総理大臣は？','伊藤博文','大隈重信','板垣退助','西郷隆盛','大日本帝国憲法づくりの 中心'],
+      ['外務大臣 小村寿太郎が 回復に 成功した 権利は？','関税自主権','選挙権','参政権','著作権','輸入品に かける 税を 自分の 国で 決める'],
+      ['黄熱病の 研究で 知られる 医学者は？','野口英世','北里柴三郎','杉田玄白','福沢諭吉','以前の 千円札の 人物'],
+      ['1945年8月6日に 原子爆弾が 落とされた 都市は？','広島','長崎','東京','大阪','原爆ドームが ある'],
+      ['国の 予算を 最終的に 決める ところは？','国会','裁判所','内閣','都道府県','法律と 予算を 決める']
+    ]
+  }
+};
+for(const t in QBANK_MORE) for(const g in QBANK_MORE[t]) QBANK[t][g].push(...QBANK_MORE[t][g]);
+
+/* ========= ついか：かんじ（その学年で ならう 漢字） ========= */
+const KANJI_MORE = {
+  1:[['火','ひ'],['月','つき'],['木','き'],['土','つち'],['お金','おかね'],['男の子','おとこのこ'],['女の子','おんなのこ'],['千円','せんえん'],['名まえ','なまえ'],['早い','はやい'],['大きい','おおきい'],['小さい','ちいさい'],['入る','はいる'],['出る','でる'],['立つ','たつ'],['右','みぎ'],['左','ひだり'],['本','ほん'],['音','おと'],['玉','たま'],['花火','はなび'],['子ども','こども'],['上','うえ'],['下','した'],['中','なか']],
+  2:[['兄','あに'],['姉','あね'],['父','ちち'],['母','はは'],['友だち','ともだち'],['家','いえ'],['店','みせ'],['道','みち'],['羽','はね'],['頭','あたま'],['首','くび'],['毛','け'],['声','こえ'],['絵','え'],['寺','てら'],['米','こめ'],['茶色','ちゃいろ'],['黄色','きいろ'],['新しい','あたらしい'],['強い','つよい'],['弱い','よわい'],['遠い','とおい'],['近い','ちかい'],['歩く','あるく'],['走る','はしる'],['買う','かう'],['売る','うる'],['書く','かく'],['読む','よむ'],['聞く','きく'],['話す','はなす']],
+  3:[['港','みなと'],['岸','きし'],['橋','はし'],['坂道','さかみち'],['血','ち'],['指','ゆび'],['息','いき'],['筆','ふで'],['板','いた'],['柱','はしら'],['皮','かわ'],['世界','せかい'],['銀色','ぎんいろ'],['黒板','こくばん'],['急ぐ','いそぐ'],['遊ぶ','あそぶ'],['泳ぐ','およぐ'],['打つ','うつ'],['投げる','なげる'],['落ちる','おちる'],['拾う','ひろう'],['寒い','さむい'],['暑い','あつい'],['悲しい','かなしい'],['軽い','かるい'],['深い','ふかい'],['美しい','うつくしい'],['運動会','うんどうかい'],['図書館','としょかん'],['動物','どうぶつ']],
+  4:[['芽','め'],['束','たば'],['帯','おび'],['城','しろ'],['倉','くら'],['牧場','ぼくじょう'],['飛ぶ','とぶ'],['借りる','かりる'],['焼く','やく'],['祝う','いわう'],['浅い','あさい'],['静か','しずか'],['願い','ねがい'],['愛','あい'],['希望','きぼう'],['博物館','はくぶつかん'],['試験','しけん'],['参加','さんか'],['熱','ねつ'],['席','せき'],['札','ふだ'],['置く','おく'],['続く','つづく'],['残る','のこる'],['覚える','おぼえる'],['選ぶ','えらぶ'],['伝える','つたえる'],['働く','はたらく'],['栄える','さかえる'],['変化','へんか']],
+  5:[['囲む','かこむ'],['移る','うつる'],['易しい','やさしい'],['解く','とく'],['慣れる','なれる'],['基本','きほん'],['規則','きそく'],['救う','すくう'],['境','さかい'],['禁止','きんし'],['険しい','けわしい'],['厚い','あつい'],['耕す','たがやす'],['興味','きょうみ'],['災害','さいがい'],['財布','さいふ'],['雑草','ざっそう'],['酸素','さんそ'],['支える','ささえる'],['歴史','れきし'],['示す','しめす'],['似る','にる'],['質問','しつもん'],['謝る','あやまる'],['準備','じゅんび'],['招く','まねく'],['織る','おる'],['貸す','かす'],['断る','ことわる'],['比べる','くらべる'],['粉','こな'],['編む','あむ'],['保つ','たもつ'],['余る','あまる'],['留守','るす'],['武士','ぶし']],
+  6:[['異なる','ことなる'],['映る','うつる'],['延びる','のびる'],['灰','はい'],['割る','わる'],['干す','ほす'],['巻く','まく'],['危ない','あぶない'],['吸う','すう'],['警察','けいさつ'],['劇','げき'],['激しい','はげしい'],['厳しい','きびしい'],['呼ぶ','よぶ'],['紅茶','こうちゃ'],['降る','ふる'],['困る','こまる'],['座る','すわる'],['私','わたし'],['姿','すがた'],['若い','わかい'],['縮む','ちぢむ'],['傷','きず'],['針','はり'],['舌','した'],['染める','そめる'],['操る','あやつる'],['頂上','ちょうじょう'],['痛い','いたい'],['難しい','むずかしい'],['認める','みとめる'],['拝む','おがむ'],['腹','はら'],['並ぶ','ならぶ'],['閉じる','とじる'],['訪ねる','たずねる'],['模型','もけい'],['優しい','やさしい'],['預ける','あずける'],['欲しい','ほしい'],['裏','うら']]
+};
+for(const g in KANJI_MORE) KANJI[g].push(...KANJI_MORE[g]);
+
+/* ========= ついか：こくごの 文章（各学年 +4文章 → 12文章・24問） ========= */
+const READING_MORE2 = {
+  1:[
+    {t:'きょうは えんそくです。みんなで やまに のぼりました。てっぺんで たべた おにぎりは、とても おいしかったです。',
+     qs:[{q:'みんなで どこに のぼりましたか。',a:['やま','き','がっこうの やね','すべりだい'],h:'えんそく'},
+         {q:'てっぺんで なにを たべましたか。',a:['おにぎり','パン','ケーキ','りんご'],h:'とても おいしかった'}]},
+    {t:'こうえんに 小さな いけが あります。いけには あかい さかなが 五ひき、くろい さかなが 一ぴき およいで います。',
+     qs:[{q:'あかい さかなは なんびき いますか。',a:['五ひき','一ぴき','三びき','十ぴき'],h:'いけには'},
+         {q:'いけは どこに ありますか。',a:['こうえん','がっこう','いえの なか','山の 上'],h:'小さな いけ'}]},
+    {t:'まいさんは おかあさんと いっしょに ケーキを つくりました。いちごを 八こ のせて、できあがりです。',
+     qs:[{q:'だれと ケーキを つくりましたか。',a:['おかあさん','おとうさん','ともだち','せんせい'],h:'いっしょに'},
+         {q:'いちごを いくつ のせましたか。',a:['八こ','三こ','五こ','十こ'],h:'できあがり'}]},
+    {t:'くもの すきまから、おひさまが かおを だしました。すると、そらに 七いろの にじが かかりました。',
+     qs:[{q:'そらに なにが かかりましたか。',a:['にじ','ほし','つき','かみなり'],h:'すると'},
+         {q:'にじは なんいろでしたか。',a:['七いろ','三いろ','一いろ','十いろ'],h:'そらに'}]}
+  ],
+  2:[
+    {t:'夏休みに、おじさんの 家で カブトムシを 見つけました。夜に なると、木の みつを すいに 来るそうです。',
+     qs:[{q:'何を 見つけましたか。',a:['カブトムシ','クワガタ','セミ','チョウ'],h:'おじさんの 家で'},
+         {q:'カブトムシは いつ みつを すいに 来ますか。',a:['夜','朝','昼','夕方'],h:'来るそうです'}]},
+    {t:'あおいさんの 学校では、毎週 金曜日に 本の 読み聞かせが あります。上の 学年の 人が 本を 読んで くれます。',
+     qs:[{q:'読み聞かせは いつ ありますか。',a:['毎週 金曜日','毎日','毎週 月曜日','月に 一回'],h:'あおいさんの 学校では'},
+         {q:'だれが 本を 読んで くれますか。',a:['上の 学年の 人','先生','おうちの 人','友だち'],h:'読んで くれます'}]},
+    {t:'こうたさんは、なわとびの 前とびが 十回 しか できませんでした。毎日 れんしゅうを して、一か月後には 五十回 とべる ように なりました。',
+     qs:[{q:'はじめ、前とびは 何回 できましたか。',a:['十回','五十回','一回','百回'],h:'しか できませんでした'},
+         {q:'五十回 とべる ように なったのは なぜですか。',a:['毎日 れんしゅうしたから','なわを かえたから','友だちに たのんだから','体が 大きく なったから'],h:'一か月後'}]},
+    {t:'さつまいもの なえを 植えてから、およそ 四か月で いもを ほる ことが できます。ほった いもは、やきいもに して みんなで 食べました。',
+     qs:[{q:'いもを ほれるまで どのくらい かかりますか。',a:['およそ 四か月','一週間','一年','二日'],h:'植えてから'},
+         {q:'ほった いもを どう しましたか。',a:['やきいもに して 食べた','すてた','売った','かざった'],h:'みんなで'}]}
+  ],
+  3:[
+    {t:'アリは、えさを 見つけると、においの ついた 道を つくりながら すに 帰ります。ほかの アリは その においを たどって、えさの ところへ 向かうのです。',
+     qs:[{q:'アリは どのように して なかまに えさの 場所を 伝えますか。',a:['においの ついた 道を つくる','大きな 声で よぶ','ダンスを する','光で 知らせる'],h:'見つけると'},
+         {q:'ほかの アリは 何を たどりますか。',a:['におい','音','光','色'],h:'ほかの アリは'}]},
+    {t:'ひなたさんは、図書館で 星の 本を 借りました。夜、本を 見ながら 空を 見上げると、夏の 大三角が 見つかりました。',
+     qs:[{q:'ひなたさんは 図書館で 何を しましたか。',a:['星の 本を 借りた','星を 見た','本を 返した','勉強会に 出た'],h:'図書館で'},
+         {q:'空に 何を 見つけましたか。',a:['夏の 大三角','オリオン座','北極星','流れ星'],h:'見上げると'}]},
+    {t:'町の パン屋さんは、朝 四時から パンを やきはじめます。開店する 七時には、たなに やきたての パンが ならびます。',
+     qs:[{q:'パン屋さんは 何時から パンを やきますか。',a:['四時','七時','六時','十時'],h:'やきはじめます'},
+         {q:'開店するのは 何時ですか。',a:['七時','四時','九時','十二時'],h:'開店する'}]},
+    {t:'ゆうとさんの 家では、ねこを 二ひき かって います。白い ねこは シロ、黒い ねこは クロという 名前です。シロは あまえんぼうで、クロは とても 元気です。',
+     qs:[{q:'白い ねこの 名前は 何ですか。',a:['シロ','クロ','ミケ','タマ'],h:'白い ねこは'},
+         {q:'クロは どんな ねこですか。',a:['とても 元気','あまえんぼう','おとなしい','こわがり'],h:'クロは'}]}
+  ],
+  4:[
+    {t:'カメレオンは、まわりの 明るさや 気温、気分などに よって 体の 色を 変える ことが できる。また、左右の 目を べつべつに 動かせるので、広い はんいを 見わたせる。',
+     qs:[{q:'カメレオンの 体の 色が 変わる 理由として 書かれて いない ものは どれですか。',a:['えさの しゅるい','まわりの 明るさ','気温','気分'],h:'に よって'},
+         {q:'カメレオンが 広い はんいを 見わたせるのは なぜですか。',a:['左右の 目を べつべつに 動かせるから','首が 長いから','体の 色が 変わるから','木に のぼるから'],h:'見わたせる'}]},
+    {t:'わたしの 町では、毎年 夏に 川で とうろう流しが 行われる。とうろうに 願いごとを 書いて 川に 流すと、灯りが ゆらゆらと 下流へ 進んで いき、とても 美しい。',
+     qs:[{q:'とうろう流しは いつ 行われますか。',a:['毎年 夏','毎年 冬','毎月','毎週'],h:'わたしの 町では'},
+         {q:'とうろうには 何を 書きますか。',a:['願いごと','自分の 住所','絵だけ','日づけだけ'],h:'川に 流すと'}]},
+    {t:'りくは、さか上がりが できなかった。くやしくて、毎朝 早く 学校に 行って 練習した。ある日、とうとう 体が くるりと 回った。思わず「やった！」と さけんだ。',
+     qs:[{q:'りくは どこで 練習しましたか。',a:['学校','家の にわ','公園','体育館'],h:'毎朝 早く'},
+         {q:'さか上がりが できた ときの りくの 気持ちは？',a:['うれしい','くやしい','かなしい','こわい'],h:'思わず'}]},
+    {t:'「さるも木から落ちる」という ことわざは、木登りが 上手な さるでも 落ちる ことが ある ように、どんな 名人でも 失敗する ことが ある という 意味だ。',
+     qs:[{q:'この ことわざの 意味は どれですか。',a:['名人でも 失敗する ことが ある','さるは 木登りが 苦手だ','木から 落ちると けがを する','何でも 練習すれば できる'],h:'という 意味'},
+         {q:'この ことわざと にた 意味の ことわざは どれですか。',a:['かっぱの川流れ','急がば回れ','石の上にも三年','ちりも積もれば山となる'],h:'名人でも'}]}
+  ],
+  5:[
+    {t:'ラッコは、海に うかんだ まま 貝を 食べる。おなかの 上に 石を のせ、その 石に 貝を 打ちつけて からを わるのだ。道具を 使う めずらしい 動物と して 知られて いる。',
+     qs:[{q:'ラッコは 貝の からを どうやって わりますか。',a:['おなかの 上の 石に 打ちつける','歯で かみくだく','岩に 投げつける','なかまに わって もらう'],h:'からを わる'},
+         {q:'ラッコは どんな 動物と して 知られて いますか。',a:['道具を 使う 動物','空を 飛ぶ 動物','冬みんする 動物','陸で くらす 動物'],h:'めずらしい'}]},
+    {t:'そうまの 祖父は、昔 大工だった。そうまが 夏休みの 工作で 本立てを 作って いると、祖父は「木目を 見て、のこぎりを まっすぐ 引くんだよ」と 教えて くれた。できあがった 本立ては 少し ゆがんで いたが、そうまの 宝物に なった。',
+     qs:[{q:'祖父の 昔の 仕事は 何ですか。',a:['大工','漁師','先生','医者'],h:'昔'},
+         {q:'本立てが そうまの 宝物に なったのは なぜだと 考えられますか。',a:['祖父に 教わりながら 自分で 作ったから','高い ねだんで 売れるから','少しも ゆがんで いないから','店で 買った ものだから'],h:'できあがった'}]},
+    {t:'日本の 伝統的な 家に 使われて いる「しょうじ」は、木の わくに 紙を はった 戸だ。紙は 光を やわらかく 通すので、部屋の 中を ほどよく 明るく して くれる。',
+     qs:[{q:'しょうじは 何で できて いますか。',a:['木の わくと 紙','鉄と ガラス','石と 土','プラスチック'],h:'伝統的な 家'},
+         {q:'しょうじの 紙の よさは 何ですか。',a:['光を やわらかく 通す','雨を はじく','音を 大きく する','冷たい 風を 入れる'],h:'紙は'}]},
+    {t:'グラフを 読み取る ときは、まず 題名と、たてじく・横じくが 何を 表して いるかを 確かめる ことが 大切だ。そう しないと、数字の 意味を 取りちがえて しまう おそれが ある。',
+     qs:[{q:'グラフを 読む とき、まず 確かめる ことは 何ですか。',a:['題名と、たてじく・横じくが 表す もの','色の きれいさ','線の 太さ','作った 人の 名前'],h:'ことが 大切だ'},
+         {q:'確かめないと どう なる おそれが ありますか。',a:['数字の 意味を 取りちがえる','グラフが 消える','色が かわる','時間が かかる'],h:'そう しないと'}]}
+  ],
+  6:[
+    {t:'カラスは とても かしこい 鳥だ。車に クルミを ひかせて からを わったり、人の 顔を 覚えたり する ことが 知られて いる。一方で、ごみを 散らかす ため、町では やっかい者と して あつかわれる ことも ある。',
+     qs:[{q:'カラスが かしこいと いえる 例と して 文章に あるのは どれですか。',a:['車に クルミを ひかせて からを わる','人の ことばを 話す','計算が できる','巣に 鍵を かける'],h:'とても かしこい'},
+         {q:'町で やっかい者と される 理由は 何ですか。',a:['ごみを 散らかすから','鳴き声が きれいだから','人を 助けるから','数が 少ないから'],h:'一方で'}]},
+    {t:'修学旅行の 夜、ぼくたちは なかなか ねむれなかった。先生に 注意されないよう 小声で 話して いたが、だれかが 笑いだすと、つられて みんなで 大笑いして しまった。翌朝、ねぶそくの 顔を 見合わせて、また 笑った。',
+     qs:[{q:'修学旅行の 夜、ぼくたちは どう して いましたか。',a:['小声で 話して いた','すぐに ねむった','先生と 話して いた','外に 出かけた'],h:'なかなか'},
+         {q:'この 文章から 伝わる ふんいきは どれですか。',a:['楽しく なかの よい ようす','きびしく 静かな ようす','かなしく さびしい ようす','いかりに 満ちた ようす'],h:'また 笑った'}]},
+    {t:'世界には 約七千もの 言語が あると いわれる。しかし、話す 人が へって、消えて しまいそうな 言語も 多い。言語が 消えると、その 言葉で 受けつがれて きた 文化や 知恵も 失われて しまう。',
+     qs:[{q:'世界の 言語の 数は 約いくつと いわれて いますか。',a:['約七千','約七十','約七百','約七万'],h:'世界には'},
+         {q:'言語が 消えると 何が 失われますか。',a:['その 言葉で 受けつがれて きた 文化や 知恵','世界の 国の 数','新しい 言葉','外国の 文字'],h:'消えると'}]},
+    {t:'「石の上にも三年」は、冷たい 石の 上でも 三年 すわり続ければ あたたまる ように、つらくても しんぼう強く 続ければ、いつかは むくわれる という 意味だ。',
+     qs:[{q:'この ことわざの 意味に 合うのは どれですか。',a:['しんぼう強く 続ければ むくわれる','石の 上は 冷たい','三年たつと 何でも かわる','すぐに あきらめた ほうが よい'],h:'という 意味'},
+         {q:'この ことわざが あてはまる 場面は どれですか。',a:['苦手な ピアノを 毎日 練習して 上手に なった','一回で テストに 合格した','何も しないで 待った','すぐに 習い事を やめた'],h:'すわり続ければ'}]}
+  ]
+};
+for(const g in READING_MORE2) READING[g].push(...READING_MORE2[g]);
+
+/* ========= ついか：えいご（各学年 +20語ていど） ========= */
+const EIGO_MORE = {
+  1:[['duck','あひる','🦆','animal','ダック'],['mouse','ねずみ','🐭','animal','マウス'],['chick','ひよこ','🐤','animal','チック'],['ant','あり','🐜','animal','アント'],['bee','はち','🐝','animal','ビー'],
+     ['candy','キャンディ','🍬','food','キャンディ'],['juice','ジュース','🧃','food','ジュース'],['pizza','ピザ','🍕','food','ピザ'],['ice cream','アイスクリーム','🍦','food','アイスクリーム'],['donut','ドーナツ','🍩','food','ドーナツ'],
+     ['face','かお','🙂','body','フェイス'],['cup','コップ','🥤','thing','カップ'],['bed','ベッド','🛏️','thing','ベッド'],['box','はこ','📦','thing','ボックス'],['clock','とけい','⏰','thing','クロック'],['piano','ピアノ','🎹','thing','ピアノ'],['house','いえ','🏠','thing','ハウス'],['ship','ふね','🚢','thing','シップ'],
+     ['rainbow','にじ','🌈','nature','レインボー'],['cloud','くも','☁️','nature','クラウド'],['sea','うみ','🌊','nature','シー']],
+  2:[['zebra','しまうま','🦓','animal','ゼブラ'],['koala','コアラ','🐨','animal','コアラ'],['penguin','ペンギン','🐧','animal','ペンギン'],['whale','くじら','🐋','animal','ホエール'],['turtle','かめ','🐢','animal','タートル'],
+     ['cookie','クッキー','🍪','food','クッキー'],['corn','とうもろこし','🌽','food','コーン'],['onion','たまねぎ','🧅','food','オニオン'],['cheese','チーズ','🧀','food','チーズ'],['watermelon','すいか','🍉','food','ウォーターメロン'],
+     ['wind','かぜ','🌬️','nature','ウインド'],['mountain','やま','⛰️','nature','マウンテン'],['river','かわ','🏞️','nature','リバー'],
+     ['chair','いす','🪑','thing','チェア'],['door','ドア','🚪','thing','ドア'],['key','かぎ','🔑','thing','キー'],['umbrella','かさ','☂️','thing','アンブレラ'],['shoes','くつ','👟','thing','シューズ'],['phone','でんわ','📱','thing','フォン'],
+     ['leg','あし','🦵','body','レッグ']],
+  3:[['arm','うで','💪','body'],['knee','ひざ','','body'],['shoulder','かた','','body'],['head','頭','','body'],
+     ['windy','風が 強い','🌬️','weather'],['tired','つかれた','😩','feeling'],['fine','元気','🙆','feeling'],
+     ['volleyball','バレーボール','🏐','sport'],['table tennis','たっきゅう','🏓','sport'],['dodgeball','ドッジボール','','sport'],
+     ['circle','丸','⭕','shape'],['diamond','ひし形','🔷','shape'],
+     ['gorilla','ゴリラ','🦍','animal'],['snake','ヘビ','🐍','animal'],['sheep','ヒツジ','🐑','animal'],
+     ['pineapple','パイナップル','🍍','food'],['cucumber','キュウリ','🥒','food'],['mushroom','きのこ','🍄','food'],['peach','もも','🍑','food'],
+     ['rainbow','にじ','🌈','nature']],
+  4:[['crayon','クレヨン','🖍️','school'],['calendar','カレンダー','📅','school'],['pencil case','筆箱','','school'],['marker','マーカー','','school'],
+     ['music room','音楽室','🎵','place'],['computer room','コンピューター室','💻','place'],['toilet','トイレ','🚻','place'],
+     ['afternoon','午後','','time'],['evening','夕方','🌆','time'],
+     ['thirteen','13','','number'],['fifteen','15','','number'],['forty','40','','number'],['fifty','50','','number'],
+     ['jump','とぶ','🤸','verb'],['walk','歩く','🚶','verb'],['sleep','ねる','😴','verb'],['study','勉強する','','verb'],
+     ['spring','春','🌸','season'],['summer','夏','🌻','season'],['fall','秋','🍁','season'],['winter','冬','⛄','season']],
+  5:[['home economics','家庭科','','subject'],
+     ['nurse','看護師','','job'],['firefighter','消防士','🧑‍🚒','job'],['baker','パン屋','🥖','job'],['vet','じゅう医','','job'],['astronaut','宇宙飛行士','🧑‍🚀','job'],
+     ['February','2月','','month'],['March','3月','','month'],['May','5月','','month'],['June','6月','','month'],['September','9月','','month'],['October','10月','','month'],['November','11月','','month'],
+     ['can','〜できる','','verb'],['want','〜したい','','verb'],['like','〜が 好き','','verb'],['study','勉強する','','verb'],['go','行く','','verb'],
+     ['usually','ふだんは','','other'],['ski','スキーを する','⛷️','verb']],
+  6:[['restaurant','レストラン','','place'],['shrine','神社','⛩️','place'],['castle','城','🏯','place'],['supermarket','スーパー','🛒','place'],
+     ['school festival','文化祭','','event'],['field trip','遠足','','event'],['music festival','音楽会','','event'],
+     ['made','作った','','past'],['visited','訪れた','','past'],['swam','泳いだ','','past'],['bought','買った','','past'],['studied','勉強した','','past'],
+     ['interesting','おもしろい','','adj'],['wonderful','すばらしい','','adj'],['famous','有名な','','adj'],['small','小さい','','adj'],
+     ['India','インド','🇮🇳','country'],['Korea','韓国','🇰🇷','country'],['Italy','イタリア','🇮🇹','country'],['Canada','カナダ','🇨🇦','country'],
+     ['dream','夢','','other'],['future','将来','','other']]
+};
+for(const g in EIGO_MORE) EIGO[g].push(...EIGO_MORE[g]);
+EIGO_CAT.season = '季節';
+EIGO_SENT[5].push(
+  ['What ＿＿ is it?<br><small>（何時ですか）</small>','time','day','color','sport','時こくを たずねる'],
+  ['I ＿＿ swim.<br><small>（わたしは 泳げます）</small>','can','am','is','do','「〜できる」と いう ことば'],
+  ['Turn ＿＿.<br><small>（右に 曲がって ください）</small>','right','left','straight','back','左の 反対'],
+  ['This is my ＿＿.<br><small>（こちらは わたしの 兄です）</small>','brother','sister','mother','aunt','男の きょうだい'],
+  ['How ＿＿ are you?<br><small>（あなたは 何さいですか）</small>','old','much','many','long','年れいを たずねる'],
+  ['I ＿＿ cook.<br><small>（わたしは 料理が できません）</small>','can’t','can','am','don’t','「〜できない」']
+);
+EIGO_SENT[6].push(
+  ['I ＿＿ a lot of fun.<br><small>（とても 楽しかった）</small>','had','have','has','having','have の 過去の 形'],
+  ['What did you ＿＿ in summer vacation?<br><small>（夏休みに 何を しましたか）</small>','do','did','does','doing','did の あとは もとの 形'],
+  ['I want to ＿＿ Italy.<br><small>（イタリアに 行きたい）</small>','go to','went to','goes to','going to','want to の あとは もとの 形'],
+  ['I ＿＿ swimming in the sea.<br><small>（海で 泳ぐのを 楽しみました）</small>','enjoyed','enjoy','enjoys','enjoying','enjoy の 過去の 形'],
+  ['Our town ＿＿ a beautiful lake.<br><small>（わたしたちの 町には 美しい 湖が あります）</small>','has','have','is','are','town は 1つ'],
+  ['My dream is ＿＿ a doctor.<br><small>（わたしの 夢は 医者に なる ことです）</small>','to be','be','being','been','「〜に なる こと」']
+);
+
+/* ========= ついか：さんすうの 問題の しゅるい ========= */
+const lcm = (a,b) => a/gcd(a,b)*b;
+const CLOCK = h => String.fromCodePoint(0x1F550 + h - 1);        // 🕐〜🕛
+const CLOCKH = h => String.fromCodePoint(0x1F55C + h - 1);       // 🕜〜🕧（はん）
+const timeStr = tot => { const H=Math.floor(tot/60)%12||12, M=tot%60; return M ? `${H}時${M}分` : `${H}時`; };
+MATH[1].push(
+  ()=>{ const a=rnd(2,9), b=rnd(1,9), c=rnd(1,Math.min(9,20-a-b)); const s=a+b+c; return mk(`${a} + ${b} + ${c} = ?`, s, numChoices(s,{spread:3}), '3つの かずの たしざん', `${a} + ${b} + ${c} = ${s}`, false,
+    `まず ${a} + ${b} = ${a+b}。それに ${c} を たそう`); },
+  ()=>{ const h=rnd(1,12), half=Math.random()<.5; const lbl = x=>`${x.h}じ${x.half?'はん':''}`;
+    const ans={h,half}; const cands=[{h,half:!half},{h:h%12+1,half},{h:(h+10)%12+1,half},{h:h%12+1,half:!half}];
+    const set=new Map([[lbl(ans),1]]); cands.forEach(c=>{ if(set.size<4) set.set(lbl(c),1); });
+    return mk(`<div class="emo-big">${half?CLOCKH(h):CLOCK(h)}</div><div style="font-size:.6em">なんじ かな？</div>`, lbl(ans), shuffle([...set.keys()]).map(v=>({html:v,key:v})), 'とけい', lbl(ans), true,
+      half ? 'ながい はりが 6の ときは「はん」だよ。みじかい はりは どこかな？' : 'ながい はりが 12の ときは「ちょうど」。みじかい はりを みよう'); }
+);
+MATH[2].push(
+  ()=>{ const a=rnd(2,9), b=rnd(2,9); return mk(`□ × ${b} = ${a*b}`, a, numChoices(a,{spread:2,min:1}), '□に 入る 数', `${a} × ${b} = ${a*b}`, false,
+    `${b}の だんで、こたえが ${a*b}に なるのは？`); },
+  ()=>{ const L=rnd(1,5), dl=rnd(1,9); const s=L*10+dl; return mk(`${L}L${dl}dL は 何dL？`, s+'dL', unit(numChoices(s,{extra:[L+dl,L*100+dl,s+10]}),'dL'), 'かさ', `1L = 10dL だから ${s}dL`, true,
+    `1L は 10dL。${L}L は ${L*10}dL`); },
+  ()=>{ const h=rnd(1,2), m=rnd(1,5)*10; const s=h*60+m; return mk(`${h}時間${m}分 は 何分？`, s+'分', unit(numChoices(s,{extra:[h*100+m,h*10+m,s+10,s-10]}),'分'), '時間', `1時間 = 60分 だから ${s}分`, true,
+    `1時間は 60分だよ`); }
+);
+MATH[3].push(
+  ()=>{ const k=rnd(1,5), m=rnd(1,9)*100; const s=k*1000+m; return mk(`${k}km${m}m は 何m？`, s+'m', unit(numChoices(s,{extra:[k*100+m,k+m,s+1000,s-100]}),'m'), '長さ', `1km = 1000m だから ${s}m`, true,
+    `1km は 1000m`); },
+  ()=>{ const h=rnd(1,10), m=rnd(1,5)*10, add=pick([20,30,40,50]); const t=h*60+m, r=t+add;
+    const ks=new Set([timeStr(r)]); [r+10,r-10,r+60,r-60,t+add-60].forEach(v=>{ if(ks.size<4 && v>60) ks.add(timeStr(v)); });
+    return mk(`${timeStr(t)}の ${add}分後は？`, timeStr(r), shuffle([...ks]).map(v=>({html:v,key:v})), '時こくと 時間', `${timeStr(t)} → ${timeStr(r)}`, true,
+      m+add>=60 ? `${m}分から あと ${60-m}分で ${h+1}時。のこりは ${add-(60-m)}分` : `${m}分に ${add}分を たそう`); },
+  ()=>{ const k=rnd(1,4), g=rnd(1,9)*100; const s=k*1000+g; return mk(`${k}kg${g}g は 何g？`, s+'g', unit(numChoices(s,{extra:[k*100+g,k+g,s+1000,s-100]}),'g'), '重さ', `1kg = 1000g だから ${s}g`, true,
+    `1kg は 1000g`); }
+);
+MATH[4].push(
+  ()=>{ let n; do{ n=rnd(1000,9999); }while(n%100===50);
+    const r=Math.round(n/100)*100, fl=Math.floor(n/100)*100, ce=Math.ceil(n/100)*100, r10=Math.round(n/10)*10, r1000=Math.round(n/1000)*1000;
+    const set=new Set([r]); [fl,ce,r10,r1000,r+100,r-100,r+200,r-200].forEach(v=>{ if(set.size<4 && v>0) set.add(v); });
+    return mk(`${n.toLocaleString()} を 四捨五入して<br>百の位までの がい数に すると？`, r, shuffle([...set]).map(v=>({html:v.toLocaleString(),key:String(v)})), 'がい数', `十の位が ${Math.floor(n/10)%10} → ${r.toLocaleString()}`, true,
+      `十の位（${Math.floor(n/10)%10}）が 5以上なら 切り上げ、4以下なら 切り捨て`); },
+  ()=>{ const b=rnd(12,39), q=rnd(2,9); const a=b*q; return mk(`${a} ÷ ${b} = ?`, q, numChoices(q,{spread:2,min:1}), '2けたで わる わり算', `${b} × ${q} = ${a}`, false,
+    `${b} を 約 ${Math.round(b/10)*10} と 見て、見当を つけよう`); }
+);
+MATH[5].push(
+  ()=>{ let ns, avg; do{ avg=rnd(6,20); ns=[rnd(2,30),rnd(2,30),rnd(2,30)]; ns.push(avg*4-ns.reduce((a,b)=>a+b,0)); }while(ns[3]<1||ns[3]>35);
+    return mk(`${ns.join('、')} の 平均は？`, avg, numChoices(avg,{spread:3,extra:[avg*4,avg+1]}), '平均', `(${ns.join('+')}) ÷ 4 = ${avg}`, true,
+      `平均 ＝ 合計 ÷ 個数（合計は ${avg*4}）`); },
+  ()=>{ let n,d; do{ d=rnd(3,9); n=rnd(1,d-1); }while(gcd(n,d)!==1); const k=rnd(2,6);
+    const ak=fkey(n,d); const set=new Map([[ak,F(n,d)]]);
+    [[n,d+1],[n+1,d],[n*k,d],[n,d*k],[n+1,d+1],[d-n,d]].forEach(([x,y])=>{ const kk=fkey(x,y); if(set.size<4 && !set.has(kk) && x<y) set.set(kk,F(x,y)); });
+    while(set.size<4){ const x=rnd(1,8), y=rnd(x+1,12); const kk=fkey(x,y); if(!set.has(kk)) set.set(kk,F(x,y)); }
+    return mk(`${FR(n*k,d*k)} を 約分すると？`, ak, shuffle([...set].map(([kk,h])=>({html:h,key:kk}))), '約分', `分子と 分母を ${k} で わって ${F(n,d)}`, false,
+      `分子と 分母を 同じ 数で わろう。${n*k} と ${d*k} を どちらも わりきれる 数は？`); },
+  ()=>{ const [a,b]=pick([[2,3],[3,4],[4,6],[6,8],[4,10],[6,9],[8,12],[5,6],[3,5],[6,10],[2,5],[3,8]]); const l=lcm(a,b);
+    return mk(`${a} と ${b} の 最小公倍数は？`, l, numChoices(l,{spread:4,min:2,extra:[a*b,l*2,l+a]}), '公倍数', `${a} と ${b} の 最小公倍数は ${l}`, true,
+      `${b} の 倍数（${b}、${b*2}、${b*3}…）の 中で、${a} でも わりきれる 一番 小さい 数`); }
+);
+MATH[6].push(
+  ()=>{ const b=rnd(3,9), x=rnd(2,12); const plus=Math.random()<.4;
+    return plus ? mk(`x + ${b*3} = ${x+b*3}<br><small style="font-size:.6em">x に あてはまる 数は？</small>`, x, numChoices(x,{spread:3,min:1,extra:[x+b*3*2]}), '文字と 式', `x = ${x+b*3} − ${b*3} = ${x}`, true, `${x+b*3} − ${b*3} を 計算しよう`)
+                : mk(`x × ${b} = ${b*x}<br><small style="font-size:.6em">x に あてはまる 数は？</small>`, x, numChoices(x,{spread:3,min:1,extra:[b*x*b]}), '文字と 式', `x = ${b*x} ÷ ${b} = ${x}`, true, `${b*x} ÷ ${b} を 計算しよう`); },
+  ()=>{ const t=rnd(2,5), v=pick([30,40,45,50,60,80]); return mk(`${v*t}km を ${t}時間で 進むと<br>時速 何km？`, v+'km', unit(numChoices(v,{spread:5,extra:[v*t,v*t*t,v+10]}),'km'), '速さ', `${v*t} ÷ ${t} = 時速${v}km`, true,
+    `速さ ＝ 道のり ÷ 時間`); },
+  ()=>{ const [q,a,ex]=pick([
+      ['A・B・C の 3人が 1列に 並ぶ 並び方は 何通り？',6,'3 × 2 × 1 = 6通り'],
+      ['A・B・C・D の 4人が 1列に 並ぶ 並び方は 何通り？',24,'4 × 3 × 2 × 1 = 24通り'],
+      ['4人の 中から 当番を 2人 選ぶ 選び方は 何通り？',6,'AB・AC・AD・BC・BD・CD の 6通り'],
+      ['5チームが どの チームとも 1回ずつ 試合を すると、全部で 何試合？',10,'5 × 4 ÷ 2 = 10試合'],
+      ['1・2・3 の 数字カード 3まいで できる 3けたの 数は 何通り？',6,'3 × 2 × 1 = 6通り'],
+      ['赤・青・黄・緑の 4色から 2色を 選ぶ 選び方は 何通り？',6,'4 × 3 ÷ 2 = 6通り']]);
+    return mk(q, a+'通り', unit(numChoices(a,{spread:3,min:2,extra:[a*2,a+2,a/2]}),'通り'), '場合の数', ex, true,
+      `図や 表に かいて、もれや 重なりが ない ように 数えよう`); }
+);
+
+/* ========= ルール ========= */
+const Q_COUNT = 25;
+const PT_FAST = 4, PT_HINT = 3;
+const MAX_SCORE = Q_COUNT * PT_FAST;           // 100てん
+// [適正回答時間, 制限時間]（びょう）。文章の もんだいは 1.5ばい
+const TIMES = {
+  math:  {1:[12,25], 2:[15,30], 3:[18,35], 4:[22,45], 5:[27,50], 6:[30,55]},
+  kanji: {1:[8,18], 2:[8,18], 3:[9,18], 4:[9,20], 5:[10,20], 6:[10,20]},
+  read:  {1:[35,70], 2:[35,70], 3:[40,80], 4:[40,85], 5:[45,90], 6:[50,100]},
+  seikatsu:{1:[15,35], 2:[15,35]},
+  rika:  {3:[18,40], 4:[18,40], 5:[22,45], 6:[22,45]},
+  shakai:{3:[18,40], 4:[18,40], 5:[22,45], 6:[22,45]},
+  eigo:  {1:[12,25], 2:[12,25], 3:[12,25], 4:[12,25], 5:[15,30], 6:[15,30]}
+};
+const ALLG=[1,2,3,4,5,6];
+const MODES = {
+  math:    {name:'さんすう', emo:'🔢', cls:'c2', grades:ALLG, mix:g=>({math:25})},
+  kokugo:  {name:'こくご',   emo:'📖', cls:'c4', grades:ALLG, mix:g=>({kanji:13, read:12}), sub:'かんじの よみ ＋ みじかい ぶんしょう'},
+  seikatsu:{name:'せいかつ', emo:'🌱', cls:'c1', grades:[1,2], mix:g=>({seikatsu:25}), sub:'きせつ・いきもの・まちの くらし'},
+  rika:    {name:'りか',     emo:'🔬', cls:'c5', grades:[3,4,5,6], mix:g=>({rika:25})},
+  shakai:  {name:'しゃかい',     emo:'🗾', cls:'c3', grades:[3,4,5,6], mix:g=>({shakai:25})},
+  eigo:    {name:'えいご',   emo:'🔤', cls:'c7', grades:ALLG, mix:g=>({eigo:25}), sub:'たんごと 文'},
+  all:     {name:'ぜんきょうか ミックス', emo:'🌈', cls:'c6', grades:ALLG,
+            mix:g=> g<=2 ? {math:7, kanji:5, read:4, seikatsu:5, eigo:4} : {math:5, kanji:4, read:4, rika:4, shakai:4, eigo:4},
+            sub:'ぜんぶの きょうかから でるよ'}
+};
+const mixOf = (id,g) => MODES[id].mix(g);
+const TYPE_NAME = {math:'さんすう', kanji:'かんじ', read:'ぶんしょう', seikatsu:'せいかつ', rika:'りか', shakai:'しゃかい', eigo:'えいご'};
+function timesFor(q){
+  let [ideal, limit] = TIMES[q.type][G.grade];
+  if((q.small && q.type==='math') || q.sent){ ideal=Math.round(ideal*1.5); limit=Math.round(limit*1.5); }
+  return {ideal, limit};
+}
+const starsFor = s => s>=90 ? 3 : s>=70 ? 2 : s>=50 ? 1 : 0;
+
+/* ========= ゲーム状態 ========= */
+/* ========= 学年に あわせて 習った 漢字で 表示する ========= */
+const KMAP = [
+  ['ぜんきょうか','ぜん教科',2],['ぜん教科','全教科',3],['きょうか','教科',2],
+  ['さんすう','算数',2],['こくご','国語',2],['せいかつ','生活',2],['しゃかい','社会',2],['りか','理科',2],
+  ['えいご','えい語',2],['えい語','英語',4],['かんじ','かん字',1],['かん字','漢字',3],
+  ['ぶんしょう','文しょう',1],['文しょう','文章',3],['たんご','単語',4],
+  ['がくねん','学年',1],['ねんせい','年生',1],['ねん','年',1],
+  ['もういちど','もう一度',3],['もんだい','問題',3],['もん','問',3],
+  ['てんさい','天才',2],['まんてん','満点',4],['てん','点',2],['びょう','秒',3],
+  ['せいかい','正かい',1],['正かい','正解',5],['じかん','時間',2],['こたえ','答え',2],['つぎ','次',3],
+  ['あそぶ','遊ぶ',3],['あそんで','遊んで',3],['なにで','何で',2],['なんと','何と',2],
+  ['えらんでね','選んでね',4],['かえる','変える',4],['ふくしゅう','ふく習',3],['ふく習','復習',5],
+  ['さいだい','最大',4],['さいご','最後',4],['れんぞく','連続',4],['あたらしい','新しい',2],['ぜんぶ','全部',3],
+  ['でるよ','出るよ',1],['でたあと','出たあと',1],['みじかい','短い',3],
+  ['よみ','読み',2],['よむ','読む',2],['よもう','読もう',2],['よんで','読んで',2],['かいて','書いて',2],
+  ['まざって','混ざって',5],['せいげん','制限',5],['いないで','以内で',4],['いじょう','以上',4],['とると','取ると',3],
+  ['ばい','倍',3],['シールちょう','シール帳',3],['まちの','町の',1],['の まえ','の 前',2],['はやく','早く',1],
+  ['1かい','1回',2],['きせつ','季節',4],['いこう','行こう',2],['めざそう','目ざそう',1],['いきもの','生きもの',1],['かい・','回・',2],['5かいの','5回の',2],['5かい','5回',2],['さいきん','さい近',2],['さい近','最近',4],['へいきん','平きん',3],['平きん','平均',5],['ぜんたい','全体',3],['のこり','残り',4],['あそんだ','遊んだ',3],['おなじ','同じ',2],['おおい','多い',2],['い</b>','位</b>',4]
+];
+function K(s, g=G.grade){ s=String(s); for(const [a,b,gr] of KMAP){ if(g>=gr) s=s.split(a).join(b); } return s; }
+function applyK(){ $$('[data-k]').forEach(el=>{ el.innerHTML = K(el.dataset.k); }); }
+const GRADE_NAMES = ['','1ねんせい','2ねんせい','3ねんせい','4ねんせい','5ねんせい','6ねんせい'];
+const TAGS = {math:'🔢 さんすう', kanji:'✏️ かんじ', read:'📖 こくご', seikatsu:'🌱 せいかつ', rika:'🔬 りか', shakai:'🗾 しゃかい', eigo:'🔤 えいご'};
+const SUBJECTS = [
+  {id:'math', emo:'🔢', name:'さんすう', desc:{1:'たしざん・ひきざん・かぞえる',2:'くりあがり・九九・ながさ',3:'3けた・わり算・あまり',4:'2けたのかけ算・小数・面積',5:'小数のかけ算・分数・割合',6:'分数のかけ算わり算・円・速さ・比'}, cls:'c2'},
+  {id:'kanji', emo:'✏️', name:'かんじ よみ', desc:{1:'1ねんせいの かんじ',2:'2ねんせいの かんじ',3:'3年生の 漢字',4:'4年生の 漢字',5:'5年生の 漢字',6:'6年生の 漢字'}, cls:'c5'}
+];
+const STICKER_EMO = {math:['🐣','🐸','🦊','🐼','🦁','🐉'], kokugo:['🌷','🌻','🍀','🌈','🌙','🪐'], seikatsu:['🌱','🐞','','','',''], rika:['','','🔬','🧲','🌋','🧪'], shakai:['','','🗾','🏯','🚄','📜'], eigo:['🍎','🚌','⚽','📚','🎵','🌏'], all:['🍓','🍩','🍦','🍰','🍉','🎂']};
+
+let G = { grade:1, mode:'all', i:0, score:0, correct:0, combo:0, maxCombo:0, qs:[], results:[], timer:null, tStart:0, locked:false, hinted:false, t:null };
+
+function show(id){
+  $$('.screen').forEach(s=>s.classList.remove('active'));
+  $('#s-'+id).classList.add('active');
+  window.scrollTo({top:0});
+}
+$$('[data-go]').forEach(b=> b.addEventListener('click', ()=>{ sfx.click(); go(b.dataset.go); }));
+function go(id){
+  stopTimer(); clearTimeout(G.nextT);
+  if(id==='title') renderTitle();
+  if(id==='subject') renderSubject();
+  if(id==='book') renderBook();
+  if(id==='settings') renderSettings();
+  if(id==='history') renderHistory();
+  show(id);
+}
+
+/* ========= まるおゲーム共通ランキング =========
+   ・学年×教科ごとに gameId を分ける（例：manabi-g4-math）
+   ・1ページで init() は1回だけ。べつの学年・教科に切りかえる ときは、gameId を #ハッシュに 入れて ページを 開き直す
+   ・点数 ＝ 直近5回の合計点 × 15000 ＋ 5回分の残り時間の合計（秒）→ 平均が 同じなら 残り時間が 多い ほうが 上位 */
+const RANK = { ok: typeof MaruoRanking!=='undefined', r:null, id:null, unsub:null };
+const RANK_MUL = 15000;
+const rankId = (g,m) => `manabi-g${g}-${m}`;
+const encodeRank = (sum5, rem) => sum5*RANK_MUL + Math.min(RANK_MUL-1, Math.max(0, Math.round(rem)));
+const decodeRank = v => ({ avg: Math.floor((+v||0)/RANK_MUL)/5, rem: (+v||0)%RANK_MUL });
+const rankFor = (g,m) => RANK.r && RANK.id===rankId(g,m);
+function rankInit(id){
+  RANK.r = MaruoRanking.init({ gameId:id, supabaseUrl:(window.MARUO_CONFIG||{}).SUPABASE_URL, supabaseKey:(window.MARUO_CONFIG||{}).SUPABASE_KEY });
+  RANK.id = id;
+  RANK.r.onChange(()=>renderRankBoxes());
+  try{ history.replaceState(null,'','#'+id); }catch(e){}
+}
+// その学年・教科の ランキングを 使える 状態に する。ページを 開き直す ときは null を 返す
+function withRanking(g, m, action){
+  if(!RANK.ok) return false;
+  const id = rankId(g,m);
+  if(RANK.id===id) return true;
+  if(!RANK.r){ rankInit(id); return true; }
+  try{ sessionStorage.setItem('manabi_after', JSON.stringify({g, m, action})); }catch(e){}
+  location.hash = id; location.reload();
+  return null;
+}
+function reportRanking(st){
+  if(!rankFor(G.grade,G.mode)) return;
+  if(st.plays>=5 && st.scores.length>=5){
+    const sum5 = st.scores.reduce((a,b)=>a+b,0), rem = (st.rems||[]).reduce((a,b)=>a+b,0);
+    RANK.r.reportScore(encodeRank(sum5, rem));
+  } else RANK.r.reportScore(0);
+}
+function rankText(g,m){
+  if(!rankFor(g,m)) return '';
+  const s = RANK.r.getSummary(), st = mem.stats[g+'-'+m];
+  const plays = st ? st.plays : 0;
+  let h;
+  if(s.best>0){ const d=decodeRank(s.best); h = `🏆 じこベスト へいきん ${d.avg}てん（のこり ${d.rem}びょう）${s.rank?`<br>ぜんたい <b>${s.rank}い</b>`:''}`; }
+  else h = `🏆 ${Math.max(0,5-plays)}かい あそぶと ランキングに のるよ！`;
+  return K(h,g) + (s.status?`<div class="st">${esc(s.status)}</div>`:'');
+}
+function renderRankBoxes(){
+  [['#rank-box-sub',G.grade,G.mode],['#rank-box-res',G.grade,G.mode]].forEach(([sel,g,m])=>{
+    const el=$(sel); const t=rankText(g,m); el.innerHTML=t; el.classList.toggle('show', !!t);
+  });
+  $('#btn-rank-res').style.display = rankFor(G.grade,G.mode) ? '' : 'none';
+}
+function openRankPanel(){
+  if(!rankFor(G.grade,G.mode)) return;
+  const g=G.grade, m=G.mode;
+  $('#rk-title').textContent = K(`${g}ねん ${MODES[m].emo} ${MODE_SHORT(m)} ランキング`, g);
+  $('#rk-note').textContent = K('5かい いじょう あそんだ 人の、さいきん5かいの へいきんてん（おなじ なら のこり じかんが おおい 人が 上）', g);
+  const draw = ()=>{
+    const s = RANK.r.getSummary(), rows = (RANK.r.getLeaderboard()||[]).filter(x=>(+x.best)>0).sort((a,b)=>(+b.best)-(+a.best));
+    $('#rk-list').innerHTML = rows.length ? rows.map((x,i)=>{ const d=decodeRank(x.best); const me = s.name && x.name===s.name && +x.best===+s.best;
+      return `<div class="rk-row${me?' me':''}"><span class="no">${i<3?['🥇','🥈','🥉'][i]:i+1}</span><span>${esc(x.name||'')}</span><span class="sc">${d.avg}${K('てん',g)}<small>${K('のこり',g)} ${d.rem}${K('びょう',g)}</small></span></div>`; }).join('')
+      : `<div class="empty">${K('まだ だれも のって いないよ',g)}</div>`;
+  };
+  draw(); $('#rank-modal').classList.add('show');
+  try{ const p = RANK.r.sync && RANK.r.sync(); if(p && p.then) p.then(draw, ()=>{}); }catch(e){}
+}
+$('#rk-close').addEventListener('click', ()=>{ sfx.click(); $('#rank-modal').classList.remove('show'); });
+$('#rk-kit').addEventListener('click', ()=>{ sfx.click(); $('#rank-modal').classList.remove('show'); if(RANK.r && !(typeof MaruoOpening!=='undefined' && MaruoOpening.isPlaying())) RANK.r.openPanel(); });
+$('#btn-rank-res').addEventListener('click', ()=>{ sfx.click(); openRankPanel(); });
+// オープニング中・キットの ランキング画面を 開いている 間は、ゲームの 操作を 受けつけない
+document.addEventListener('click', e=>{
+  const busy = (typeof MaruoOpening!=='undefined' && MaruoOpening.isPlaying()) || (RANK.r && RANK.r.isPanelOpen());
+  if(busy && e.target.closest && e.target.closest('#app, .modal')){ e.stopPropagation(); e.preventDefault(); }
+}, true);
+function renderRankChips(){
+  const box=$('#rank-chips');
+  if(!RANK.ok){ box.classList.remove('show'); return; }
+  const g=G.grade;
+  $('#rank-chip-list').innerHTML = Object.entries(MODES).filter(([id,m])=>m.grades.includes(g))
+    .map(([id,m])=>`<button class="chip" data-m="${id}">${m.emo} ${K(MODE_SHORT(id),g)}</button>`).join('');
+  $$('#rank-chip-list .chip').forEach(c=>c.addEventListener('click',()=>{ sfx.click(); G.mode=c.dataset.m; if(withRanking(g,G.mode,'panel')===null) return; renderRankBoxes(); openRankPanel(); }));
+  box.classList.add('show');
+}
+
+function statFor(g,m){ return mem.stats[g+'-'+m] || null; }
+function avg5(st){ return st && st.scores.length ? Math.round(st.scores.reduce((a,b)=>a+b,0)/st.scores.length) : 0; }
+const esc = t => String(t).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function plainHTML(h){ return String(h).replace(/<span class="frac"><span>(.*?)<\/span><span>(.*?)<\/span><\/span>/g,'$1/$2').replace(/<br\s*\/?>/g,' ').replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim(); }
+function plainQ(q){
+  if(q.type==='read'){ const m=q.q.match(/<div class="rq">([\s\S]*?)<\/div>/); return 'ぶんしょう：'+(m?plainHTML(m[1]):''); }
+  if(q.type==='kanji') return '「'+plainHTML(q.q)+'」の よみ';
+  return plainHTML(q.q);
+}
+const MODE_SHORT = id => id==='all' ? 'ミックス' : MODES[id].name;
+function renderSettings(){
+  const keys = Object.keys(mem.stats).sort((a,b)=>{ const [ga,ma]=a.split('-'), [gb,mb]=b.split('-'); return ga-gb || Object.keys(MODES).indexOf(ma)-Object.keys(MODES).indexOf(mb); });
+  const total = keys.reduce((a,k)=>a+mem.stats[k].plays,0);
+  const allScores = [].concat(...keys.map(k=>mem.stats[k].scores));
+  let html = `<div class="stat-total"><div>プレイ<b>${total}</b>かい</div><div>シール<b>${Object.keys(mem.stickers).length}</b>まい</div><div>まちがい<b>${mem.hist.length}</b>もん</div></div>`;
+  html += keys.length ? keys.map(k=>{ const [g,m]=k.split('-'); const st=mem.stats[k], b=mem.best[k];
+      return `<div class="stat-row"><span>${g}ねん ${MODES[m]?MODES[m].emo:''} ${K(MODE_SHORT(m),+g)}</span><span>${b?starsText(b.stars):''}</span>
+        <small>プレイ ${st.plays}かい ・ さいきん5かいの へいきん ${avg5(st)}てん ・ ベスト ${b?b.score:0}てん</small></div>`; }).join('')
+    : '<div class="empty">まだ きろくが ないよ。<br>あそぶと ここに たまって いくよ！</div>';
+  $('#stats-body').innerHTML = html;
+  $('#hist-count').textContent = mem.hist.length;
+}
+G.histFilter = 0;
+function renderHistory(){
+  const f=G.histFilter;
+  $('#hist-filter').innerHTML = [0,1,2,3,4,5,6].map(g=>`<button class="chip${g===f?' on':''}" data-g="${g}">${g?g+'ねん':'すべて'}</button>`).join('');
+  $$('#hist-filter .chip').forEach(c=>c.addEventListener('click',()=>{ sfx.click(); G.histFilter=+c.dataset.g; renderHistory(); }));
+  const list = mem.hist.filter(h=>!f || h.g===f);
+  $('#hist-total').textContent = `${list.length}もん`;
+  const fmtD = t => { const d=new Date(t); return `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`; };
+  $('#hist-list').innerHTML = list.length ? list.slice(0,150).map(h=>`<div class="hist">
+      <div class="hh">${fmtD(h.t)} ・ ${h.g}ねん <span class="tag t-${esc(h.ty)}">${esc(K(TAGS[h.ty]||'',h.g))}</span></div>
+      <div class="hq">${esc(h.q)}</div>
+      <div class="ha">こたえ：${esc(h.a)}</div>
+      <div class="hp">${h.p===null?'⏰ じかんぎれ':'えらんだ こたえ：'+esc(h.p)}</div>
+    </div>`).join('') : '<div class="empty">まちがえた もんだいは ないよ 🎉</div>';
+}
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast.tm); toast.tm=setTimeout(()=>t.classList.remove('show'),1800); }
+function askConfirm(msg, onOk){
+  $('#modal-msg').innerHTML=msg; $('#modal').classList.add('show');
+  $('#modal-ok').onclick=()=>{ $('#modal').classList.remove('show'); onOk(); };
+  $('#modal-cancel').onclick=()=>{ sfx.click(); $('#modal').classList.remove('show'); };
+}
+function starsText(n){ return '⭐'.repeat(n)+'☆'.repeat(3-n); }
+function bestFor(g,s){ return mem.best[g+'-'+s] || null; }
+
+function renderTitle(){
+  setMascot('happy','jump');
+  const gg = $('#grade-grid'); gg.innerHTML='';
+  for(let g=1; g<=6; g++){
+    const st = Math.max(...Object.keys(MODES).filter(m=>MODES[m].grades.includes(g)).map(m=>(bestFor(g,m)||{stars:0}).stars));
+    const b = document.createElement('button');
+    b.className = 'bigbtn c'+g;
+    b.innerHTML = `<span class="num">${g}</span><span class="lbl">${K('ねんせい',g)}</span><span class="stars">${st?starsText(st):''}</span>`;
+    b.addEventListener('click', ()=>{ sfx.click(); G.grade=g; go('subject'); });
+    gg.appendChild(b);
+  }
+}
+function renderSubject(){
+  setMascot('happy','jump');
+  $('#subject-bubble').innerHTML = K(`${GRADE_NAMES[G.grade]}だね！<br>なにで あそぶ？`); applyK(); renderRankChips(); renderRankBoxes();
+  const g=G.grade, wrap=$('#subject-grid'); wrap.innerHTML='';
+  Object.entries(MODES).filter(([id,m])=>m.grades.includes(g)).forEach(([id,m])=>{
+    const best = bestFor(g,id);
+    const mx = Object.entries(m.mix(g));
+    const parts = mx.length===1 ? `25もん（⏱ 4てんは ${TIMES[mx[0][0]][g][0]}びょう／せいげん ${TIMES[mx[0][0]][g][1]}びょう）`
+      : mx.map(([t,n])=>`${TYPE_NAME[t]}${n}`).join('・')+'　の 25もん';
+    const b=document.createElement('button'); b.className='bigbtn subj mode '+m.cls;
+    b.innerHTML=K(`<span class="emo">${m.emo}</span><span><span class="t">${m.name}</span>${m.sub?`<span class="d">${m.sub}</span>`:''}<span class="d"><small>${parts}</small></span><span class="best">${best?`ベスト ${best.score}てん　${starsText(best.stars)}`:'まだ あそんで いないよ'}${statFor(g,id)?`<br><small>プレイ ${statFor(g,id).plays}かい・さいきん5かいの へいきん ${avg5(statFor(g,id))}てん</small>`:''}</span></span>`);
+    b.addEventListener('click',()=>{ sfx.click(); G.mode=id; if(withRanking(g,id,'start')===null) return; startGame(); });
+    wrap.appendChild(b);
+  });
+}
+
+const GEN = {
+  math:(g,n)=>{ const seen=new Set(); let guard=0; const gens=MATH[g]; const m=[];
+    while(m.length<n && guard++<3000){ const q=gens[m.length%gens.length](); if(seen.has(q.q)) continue; seen.add(q.q); q.type='math'; m.push(q); } return m; },
+  kanji:(g,n)=>{ const used=new Set(), out=[]; for(let i=0;i<n;i++){ const q=kanjiQuestion(g,used); q.type='kanji'; out.push(q); } return out; },
+  read:(g,n)=> shuffle(readingQuestions(g)).slice(0,n).map(q=>{ q.type='read'; return q; }),
+  seikatsu:(g,n)=>bankQuestions('seikatsu',g,n),
+  rika:(g,n)=>bankQuestions('rika',g,n),
+  shakai:(g,n)=>bankQuestions('shakai',g,n),
+  eigo:(g,n)=>eigoQuestions(g,n)
+};
+function makeQuestions(){
+  const g=G.grade, mix=mixOf(G.mode,g), out=[];
+  Object.entries(mix).forEach(([t,n])=> out.push(...GEN[t](g,n)));
+  let qs; for(let t=0;t<200;t++){ qs=shuffle(out); if(!qs.some((q,i)=>i&&q.type==='read'&&qs[i-1].type==='read'&&qs[i-1].pid===q.pid)) break; }
+  return qs;
+}
+
+function startGame(){
+  clearTimeout(G.nextT);
+  Object.assign(G,{i:0,score:0,correct:0,combo:0,maxCombo:0,remSum:0,results:[],qs:makeQuestions()});
+  $('#hud-info').textContent = K(`${G.grade}ねん・${MODES[G.mode].emo} ${G.mode==='all'?'ミックス':MODES[G.mode].name}`); applyK();
+  $('#progress').innerHTML = Array.from({length:Q_COUNT},()=>'<i></i>').join('');
+  show('play');
+  nextQuestion();
+}
+
+function nextQuestion(){
+  if(G.i>=Q_COUNT) return finish();
+  G.locked=false; G.hinted=false;
+  const q = G.qs[G.i];
+  G.t = timesFor(q);
+  $$('#progress i').forEach((el,idx)=>{ el.classList.toggle('now', idx===G.i); });
+  $('#qlabel').innerHTML = K(`<span class="tag t-${q.type}">${TAGS[q.type]}</span> ${G.i+1} ／ ${Q_COUNT}もん　${q.label}`);
+  const qt = $('#qtext'); qt.innerHTML = q.q; qt.classList.toggle('small', !!q.small); qt.classList.toggle('read', q.type==='read');
+  $('.qbox').classList.toggle('read', q.type==='read');
+  setMascot('happy');
+  pocoSay(K(q.type==='read' ? pick(['ぶんしょうを よーく 読んでね','あわてずに 読もう！','どこに かいて あるかな？']) : pick(['がんばれ〜！','きみなら できる！','よーく 見てね','おちついて いこう！'])), '');
+  $('#hud-score').textContent = G.score;
+  $('#ideal-mark').style.left = ((1 - G.t.ideal/G.t.limit)*100)+'%';
+  const cw = $('#choices'); cw.innerHTML=''; cw.classList.toggle('list', q.type==='read' || q.choices.some(c=>c.html.replace(/<[^>]+>/g,'').length>7));
+  q.choices.forEach(c=>{
+    const b=document.createElement('button'); b.className='choice'; b.innerHTML=c.html; b.dataset.key=c.key;
+    b.addEventListener('click', ()=>answer(c.key,b));
+    cw.appendChild(b);
+  });
+  startTimer();
+}
+
+function setChance(pt){
+  const el=$('#chance');
+  el.className='pill chance'+(pt===PT_HINT?' late':'');
+  el.textContent = K(pt===PT_FAST ? '⭐ 4てん チャンス' : '💡 3てん チャンス');
+}
+function startTimer(){
+  stopTimer();
+  G.tStart = performance.now();
+  setChance(PT_FAST);
+  const bar = $('#timerbar'), sec=$('#timesec');
+  const tick = ()=>{
+    const el = (performance.now()-G.tStart)/1000;
+    const left = Math.max(0, G.t.limit - el);
+    bar.style.width = (left/G.t.limit*100)+'%';
+    bar.classList.toggle('late', el>=G.t.ideal);
+    sec.textContent = Math.ceil(left);
+    if(!G.hinted && el>=G.t.ideal) showHint();
+    if(left<=0) timeUp();
+  };
+  tick();
+  G.timer = setInterval(tick,100);
+}
+function stopTimer(){ if(G.timer){ clearInterval(G.timer); G.timer=null; } }
+
+function showHint(){
+  if(G.locked) return;
+  G.hinted=true;
+  const q=G.qs[G.i];
+  setChance(PT_HINT);
+  pocoSay(`💡 ${K('ヒントだよ！')}<br>${q.hint}`, 'hint'); buzz(40);
+  beep([880,988],0.1,'sine',0.08);
+  setMascot('happy','jump');
+}
+
+function pocoSay(html, kind){ const el=$('#poco-say'); el.className='poco-say'+(kind?' k-'+kind:''); el.innerHTML=`<span class="who">ポコ</span>${html}`; }
+function buzz(p){ try{ if(soundOn && navigator.vibrate) navigator.vibrate(p); }catch(e){} }
+function flash(txt,color){
+  const f=$('#feedback'); f.textContent=txt; f.style.color=color;
+  f.classList.remove('show'); void f.offsetWidth; f.classList.add('show');
+}
+
+const PRAISE = ['すごい！','やったね！','せいかい！','ばっちり！','てんさい！','いいね！'];
+const CHEER  = ['おしい！','だいじょうぶ！','つぎ がんばろう！','ドンマイ！'];
+
+function timeUp(){ if(!G.locked) answer(null, null); }
+
+function answer(key, btn){
+  if(G.locked) return; G.locked=true; stopTimer();
+  const q=G.qs[G.i];
+  const ok = key!==null && key===q.ans;
+  const timeout = key===null;
+  $$('.choice').forEach(b=>{ b.disabled=true; if(b.dataset.key===q.ans) b.classList.add('ok'); });
+  const pr = $$('#progress i')[G.i]; pr.classList.remove('now');
+  let gain = 0;
+  if(ok){
+    gain = G.hinted ? PT_HINT : PT_FAST;
+    G.remSum += Math.max(0, G.t.limit - (performance.now()-G.tStart)/1000);
+    G.correct++; G.combo++; G.maxCombo=Math.max(G.maxCombo,G.combo);
+    G.score += gain;
+    pr.classList.add(G.hinted?'p-hint':'ok');
+    flash('⭕','var(--ok)'); sfx.ok(); setMascot('great','jump');
+    pocoSay(K(`+${gain}てん！ ${G.hinted ? 'せいかい！ つぎは ヒントなしで いけるかな？' : pick(PRAISE)}${G.combo>=2 ? `　🔥${G.combo}れんぞく` : ''}`), 'ok'); buzz(30);
+  }else{
+    G.combo=0;
+    if(btn) btn.classList.add('ng');
+    pr.classList.add('ng');
+    flash(timeout?'⏰':'❌', timeout?'var(--orange)':'var(--ng)'); sfx.ng(); setMascot('sad','shake');
+    pocoSay(`${K(timeout?'じかん ぎれ〜！':pick(CHEER))}<br>${K('こたえは')}「${q.explain}」だよ`, 'ng'); buzz([60,40,60]);
+  }
+  $('#hud-score').textContent = G.score;
+  G.results.push({ok, gain, timeout, q, picked:key});
+  if(!ok){
+    const pc = key===null ? null : plainHTML((q.choices.find(c=>c.key===key)||{html:key}).html);
+    mem.hist.unshift({t:Date.now(), g:G.grade, m:G.mode, ty:q.type, q:plainQ(q), a:plainHTML(q.explain), p:pc});
+    if(mem.hist.length>300) mem.hist.length=300;
+    store.set('hist_v1', mem.hist);
+  }
+  G.nextT = setTimeout(()=>{ G.i++; nextQuestion(); }, ok ? 1000 : 2600);
+}
+
+function finish(){
+  stopTimer();
+  const stars = starsFor(G.score);
+  const key = G.grade+'-'+G.mode;
+  const prev = mem.best[key];
+  const isBest = !prev || G.score>prev.score;
+  if(isBest){ mem.best[key] = { score: G.score, stars: Math.max(stars, prev?prev.stars:0) }; store.set('best_v3', mem.best); }
+  const st = mem.stats[key] || {plays:0, scores:[]};
+  st.plays++; st.scores = [...st.scores, G.score].slice(-5);
+  st.rems = [...(st.rems||[]), Math.round(G.remSum*10)/10].slice(-5);
+  mem.stats[key]=st; store.set('stats_v1', mem.stats);
+  reportRanking(st);
+  let newSticker = null;
+  if(stars===3 && !mem.stickers[key]){
+    mem.stickers[key]=true; store.set('stickers_v3', mem.stickers);
+    newSticker = STICKER_EMO[G.mode][G.grade-1];
+  }
+  show('result');
+  setMascot(stars>=2?'great':stars===1?'happy':'sad', stars>=1?'jump':'shake');
+  const msgs = ['さいごまで がんばったね！<br>もういちど ちょうせんしよう！','いいかんじ！<br>つぎは 70てんを めざそう！','すごい！<br>90てんで シールが もらえるよ！', G.score===MAX_SCORE?'100てん まんてん！！<br>きみは まなびマスターだ！':'すばらしい！<br>シール ゲットだよ！'];
+  $('#result-bubble').innerHTML = K(msgs[stars]);
+  $('#result-score').innerHTML = K(`${G.score}<small style="font-size:.5em"> / ${MAX_SCORE} てん</small>`);
+  const n4 = G.results.filter(r=>r.gain===PT_FAST).length, n3 = G.results.filter(r=>r.gain===PT_HINT).length;
+  const nTO = G.results.filter(r=>r.timeout).length, nNG = Q_COUNT-n4-n3-nTO;
+  $('#result-sub').innerHTML = K(`<div class="breakdown">
+      <span class="b4">⭐ 4てん<b>${n4}</b>もん</span>
+      <span class="b3">💡 3てん<b>${n3}</b>もん</span>
+      <span class="b0">❌ 0てん<b>${nNG+nTO}</b>もん${nTO?`<small>（じかんぎれ ${nTO}）</small>`:''}</span>
+    </div>さいだい ${G.maxCombo}れんぞく せいかい${isBest&&prev?'　🎉 ベストこうしん！':''}<div class="recent">プレイ ${st.plays}かい・さいきん5かいの へいきん ${avg5(st)}てん</div>`);
+  const bySub = Object.keys(mixOf(G.mode,G.grade)).map(t=>{ const rs=G.results.filter(r=>r.q.type===t); return `<span>${TAGS[t]} <b>${rs.reduce((a,r)=>a+r.gain,0)}</b>/${rs.length*PT_FAST}</span>`; }).join('');
+  $('#result-sub').innerHTML += K(`<div class="breakdown subj">${bySub}</div>`);
+  const sp = $$('#result-stars span'); sp.forEach(s=>s.classList.remove('on'));
+  sp.forEach((s,i)=>{ if(i<stars) setTimeout(()=>{ s.classList.add('on'); sfx.click(); }, 300+i*350); });
+  $('#result-sticker').innerHTML = newSticker ? `<div class="newsticker"><span class="big">${newSticker}</span>${K('あたらしい シールを ゲット！')}</div>` : '';
+  const wrong = G.results.filter(r=>!r.ok);
+  $('#review').innerHTML = wrong.length ? `<div style="background:none;padding:0 4px">${K('📝 ふくしゅう しよう')}</div>` + wrong.map(r=>`<div>${r.timeout?'⏰ ':''}${r.q.explain}</div>`).join('') : '';
+  renderRankBoxes();
+  if(stars>=2){ sfx.fanfare(); confetti(stars===3?120:50); }
+}
+
+function confetti(n){
+  const colors=['#ff7aa8','#ffa94d','#ffd43b','#51cf66','#4dabf7','#9775fa'];
+  for(let i=0;i<n;i++){
+    const c=document.createElement('div'); c.className='confetti';
+    c.style.left=Math.random()*100+'vw'; c.style.background=pick(colors);
+    c.style.animationDuration=(2+Math.random()*2)+'s'; c.style.animationDelay=(Math.random()*.6)+'s';
+    document.body.appendChild(c); setTimeout(()=>c.remove(),5000);
+  }
+}
+
+function renderBook(){
+  const wrap=$('#stickers'); wrap.innerHTML=''; let got=0, all=0;
+  Object.entries(MODES).forEach(([id,m])=>{
+    wrap.insertAdjacentHTML('beforeend', `<div class="stk-h">${m.emo} ${m.name}</div>`);
+    for(const g of m.grades){
+      all++; const has = !!mem.stickers[g+'-'+id]; if(has) got++;
+      wrap.insertAdjacentHTML('beforeend', `<div class="sticker${has?'':' locked'}">${has?STICKER_EMO[id][g-1]:'❔'}<small>${g}ねん</small></div>`);
+    }
+  });
+  $('#book-count').textContent = `🏅 ${got} / ${all}`;
+}
+
+$('#btn-book').addEventListener('click', ()=>{ sfx.click(); go('book'); });
+$('#btn-history').addEventListener('click', ()=>{ sfx.click(); G.histFilter=0; go('history'); });
+$('#btn-reset').addEventListener('click', ()=>{ sfx.click();
+  askConfirm('ほんとうに リセットしますか？<br><small>ほし・シール・ベスト・プレイかいすう・へいきんてん・まちがえた りれきが ぜんぶ きえて、もとに もどせません。</small>', ()=>{
+    mem.best={}; mem.stickers={}; mem.stats={}; mem.hist=[];
+    ['best_v3','stickers_v3','stats_v1','hist_v1','best_mix','stickers_mix','best25','stickers','best'].forEach(k=>{ try{ localStorage.removeItem('manabi_'+k); }catch(e){} });
+    sfx.ng(); renderSettings(); toast('リセット しました');
+  });
+});
+$('#btn-quit').addEventListener('click', ()=>{ sfx.click(); go('subject'); });
+$('#btn-again').addEventListener('click', ()=>{ sfx.click(); startGame(); });
+
+refreshSoundBtns();
+renderTitle();
+(function boot(){
+  let after=null; try{ after=JSON.parse(sessionStorage.getItem('manabi_after')||'null'); sessionStorage.removeItem('manabi_after'); }catch(e){}
+  const mh = location.hash.match(/^#manabi-g([1-6])-([a-z]+)$/);
+  if(RANK.ok && mh && MODES[mh[2]] && MODES[mh[2]].grades.includes(+mh[1])) rankInit(mh[0].slice(1));
+  if(after && RANK.id===rankId(after.g, after.m)){   // 学年・教科を 切りかえて 開き直した ときは、オープニングを 出さずに つづきから
+    G.grade=after.g; G.mode=after.m; go('subject');
+    if(after.action==='start') startGame(); else openRankPanel();
+    return;
+  }
+  if(typeof MaruoOpening!=='undefined'){
+    const app=$('#app'); app.style.visibility='hidden';
+    MaruoOpening.play().then(()=>{ app.style.visibility=''; go('title'); }, ()=>{ app.style.visibility=''; });
+  }
+})();
+</script>
+</body>
+</html>
