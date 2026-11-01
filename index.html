@@ -249,8 +249,33 @@
   .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 30px);transform:translateX(-50%);background:var(--ink);color:#fff;
     padding:10px 18px;border-radius:999px;font-weight:800;opacity:0;transition:opacity .3s;z-index:60;pointer-events:none}
   .toast.show{opacity:1}
-  .newsticker{text-align:center;margin-top:10px;font-weight:800;font-size:18px}
-  .newsticker .big{font-size:70px;display:block;animation:jump .7s ease 2}
+  .newsticker{text-align:center;margin:6px 0 4px;font-weight:800;font-size:16px;background:#fff8e1;border-radius:16px;padding:8px}
+  .newsticker .big{font-size:52px;display:block;animation:jump .7s ease 2;line-height:1.1}
+  .newsticker .btn{margin-top:6px;font-size:15px;padding:9px 16px;background:var(--orange);box-shadow:0 4px 0 #e8590c}
+  #s-result.active{display:flex;flex-direction:column;overflow:hidden;padding-bottom:0;position:relative}
+  .res-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px}
+  .res-card{padding:12px 14px}
+  #s-result .mascot-wrap{margin:0 0 2px}
+  #s-result .mascot{width:64px;height:64px}
+  #s-result .bubble{font-size:14px;padding:8px 12px}
+  #s-result .result-stars{font-size:40px;margin:0}
+  #s-result .score-big{font-size:36px;line-height:1.2}
+  #s-result .breakdown{margin:4px 0;gap:6px}
+  #s-result .breakdown span{padding:4px 10px;font-size:14px}
+  #s-result .breakdown b{font-size:18px}
+  #s-result .score-sub{font-size:13px}
+  #s-result .rank-box{margin-top:8px}
+  .res-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px 0 4px;background:linear-gradient(transparent,var(--bg2) 30%)}
+  .res-actions .btn{font-size:15px;padding:11px 8px;width:100%}
+  .res-actions #btn-again{grid-column:1/-1;font-size:18px}
+  .scroll-hint{position:absolute;left:50%;transform:translateX(-50%);bottom:var(--hint-bottom,120px);border:none;font:inherit;font-weight:800;font-size:13px;
+    background:var(--ink);color:#fff;border-radius:999px;padding:6px 14px;box-shadow:0 3px 8px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:opacity .25s;z-index:5;
+    animation:hintbob 1.4s ease-in-out infinite}
+  .scroll-hint.show{opacity:.92;pointer-events:auto}
+  @keyframes hintbob{0%,100%{margin-bottom:0}50%{margin-bottom:5px}}
+  .review .rv-q{font-size:13px;color:var(--sub);font-weight:800}
+  .review .rv-a{color:var(--ok)}
+  .sticker.new{animation:jump .7s ease 3;box-shadow:0 0 0 3px var(--orange)}
 
   .confetti{position:fixed;top:-20px;width:10px;height:14px;z-index:30;pointer-events:none;border-radius:2px;animation:fall linear forwards}
   @keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
@@ -327,24 +352,26 @@
 
   <!-- RESULT -->
   <section class="screen" id="s-result">
-    <div class="card">
-      <div class="mascot-wrap" style="margin-top:0">
-        <div class="mascot-slot"></div>
-        <div class="bubble" id="result-bubble"></div>
+    <div class="res-scroll" id="res-scroll">
+      <div class="card res-card">
+        <div class="mascot-wrap" style="margin-top:0">
+          <div class="mascot-slot"></div>
+          <div class="bubble" id="result-bubble"></div>
+        </div>
+        <div class="result-stars" id="result-stars"><span>⭐</span><span>⭐</span><span>⭐</span></div>
+        <div class="score-big" id="result-score"></div>
+        <div id="result-sticker"></div>
+        <div class="score-sub" id="result-sub"></div>
+        <div class="rank-box" id="rank-box-res"></div>
+        <div class="review" id="review"></div>
       </div>
-      <div class="result-stars" id="result-stars"><span>⭐</span><span>⭐</span><span>⭐</span></div>
-      <div class="score-big" id="result-score"></div>
-      <div class="score-sub" id="result-sub"></div>
-      <div id="result-sticker"></div>
-      <div class="rank-box" id="rank-box-res"></div>
-      <div class="review" id="review"></div>
-      <div class="row">
-        <button class="btn" id="btn-again" data-k="🔁 もういちど">🔁 もういちど</button>
-        <button class="btn alt rank-only" id="btn-rank-res" style="display:none">🏆 ランキング</button>
-        <button class="btn alt" data-go="subject" data-k="📚 きょうかを かえる">📚 きょうかを かえる</button>
-        <button class="btn ghost" data-go="title" data-k="🎒 がくねんを かえる">🎒 がくねんを かえる</button>
-        
-      </div>
+    </div>
+    <button class="scroll-hint" id="scroll-hint" type="button"></button>
+    <div class="res-actions">
+      <button class="btn" id="btn-again" data-k="🔁 もういちど">🔁 もういちど</button>
+      <button class="btn alt rank-only" id="btn-rank-res" style="display:none">🏆 ランキング</button>
+      <button class="btn alt" data-go="subject" data-k="📚 きょうかを かえる">📚 きょうかを かえる</button>
+      <button class="btn ghost" data-go="title" data-k="🎒 がくねんを かえる">🎒 がくねんを かえる</button>
     </div>
   </section>
 
@@ -378,7 +405,7 @@
   <!-- STICKER BOOK -->
   <section class="screen" id="s-book">
     <header class="top">
-      <button class="iconbtn" data-go="title">← もどる</button>
+      <button class="iconbtn" id="btn-book-back">← もどる</button>
       <span class="pill" id="book-count"></span>
     </header>
     <div class="section-title">📒 シールちょう</div>
@@ -1906,7 +1933,7 @@ const KMAP = [
   ['よみ','読み',2],['よむ','読む',2],['よもう','読もう',2],['よんで','読んで',2],['かいて','書いて',2],
   ['まざって','混ざって',5],['せいげん','制限',5],['いないで','以内で',4],['いじょう','以上',4],['とると','取ると',3],
   ['ばい','倍',3],['シールちょう','シール帳',3],['まちの','町の',1],['の まえ','の 前',2],['はやく','早く',1],
-  ['1かい','1回',2],['きせつ','季節',4],['いこう','行こう',2],['めざそう','目ざそう',1],['いきもの','生きもの',1],['かい・','回・',2],['5かいの','5回の',2],['5かい','5回',2],['さいきん','さい近',2],['さい近','最近',4],['へいきん','平きん',3],['平きん','平均',5],['ぜんたい','全体',3],['のこり','残り',4],['あそんだ','遊んだ',3],['おなじ','同じ',2],['おおい','多い',2],['い</b>','位</b>',4]
+  ['1かい','1回',2],['きせつ','季節',4],['いこう','行こう',2],['めざそう','目ざそう',1],['いきもの','生きもの',1],['かい・','回・',2],['5かいの','5回の',2],['5かい','5回',2],['したに','下に',1],['さいきん','さい近',2],['さい近','最近',4],['へいきん','平きん',3],['平きん','平均',5],['ぜんたい','全体',3],['のこり','残り',4],['あそんだ','遊んだ',3],['おなじ','同じ',2],['おおい','多い',2],['い</b>','位</b>',4]
 ];
 function K(s, g=G.grade){ s=String(s); for(const [a,b,gr] of KMAP){ if(g>=gr) s=s.split(a).join(b); } return s; }
 function applyK(){ $$('[data-k]').forEach(el=>{ el.innerHTML = K(el.dataset.k); }); }
@@ -2238,7 +2265,7 @@ function finish(){
   }
   show('result');
   setMascot(stars>=2?'great':stars===1?'happy':'sad', stars>=1?'jump':'shake');
-  const msgs = ['さいごまで がんばったね！<br>もういちど ちょうせんしよう！','いいかんじ！<br>つぎは 70てんを めざそう！','すごい！<br>90てんで シールが もらえるよ！', G.score===MAX_SCORE?'100てん まんてん！！<br>きみは まなびマスターだ！':'すばらしい！<br>シール ゲットだよ！'];
+  const msgs = ['さいごまで がんばったね！<br>もういちど ちょうせんしよう！','いい ちょうし！<br>つぎは 70てんを めざそう！','すごい！<br>90てんで シールが もらえるよ！', G.score===MAX_SCORE?'100てん まんてん！！<br>きみは まなびマスターだ！':'すばらしい！<br>シール ゲットだよ！'];
   $('#result-bubble').innerHTML = K(msgs[stars]);
   $('#result-score').innerHTML = K(`${G.score}<small style="font-size:.5em"> / ${MAX_SCORE} てん</small>`);
   const n4 = G.results.filter(r=>r.gain===PT_FAST).length, n3 = G.results.filter(r=>r.gain===PT_HINT).length;
@@ -2252,9 +2279,12 @@ function finish(){
   $('#result-sub').innerHTML += K(`<div class="breakdown subj">${bySub}</div>`);
   const sp = $$('#result-stars span'); sp.forEach(s=>s.classList.remove('on'));
   sp.forEach((s,i)=>{ if(i<stars) setTimeout(()=>{ s.classList.add('on'); sfx.click(); }, 300+i*350); });
-  $('#result-sticker').innerHTML = newSticker ? `<div class="newsticker"><span class="big">${newSticker}</span>${K('あたらしい シールを ゲット！')}</div>` : '';
+  G.newStickerKey = newSticker ? key : null;
+  $('#result-sticker').innerHTML = newSticker ? `<div class="newsticker"><span class="big">${newSticker}</span>${K('あたらしい シールを ゲット！')}<br><button class="btn" id="btn-to-book">${K('📒 シールちょうを 見る')}</button></div>` : '';
+  if(newSticker) $('#btn-to-book').addEventListener('click', ()=>{ sfx.click(); G.bookBack='result'; go('book'); });
+  $('#res-scroll').scrollTop = 0; setTimeout(updateScrollHint, 50); setTimeout(updateScrollHint, 1400);
   const wrong = G.results.filter(r=>!r.ok);
-  $('#review').innerHTML = wrong.length ? `<div style="background:none;padding:0 4px">${K('📝 ふくしゅう しよう')}</div>` + wrong.map(r=>`<div>${r.timeout?'⏰ ':''}${r.q.explain}</div>`).join('') : '';
+  $('#review').innerHTML = wrong.length ? `<div style="background:none;padding:0 4px">${K('📝 ふくしゅう しよう')}</div>` + wrong.map(r=>{ const qq=plainQ(r.q); return `<div><span class="rv-q">${r.timeout?'⏰ ':''}${esc(qq.length>60?qq.slice(0,60)+'…':qq)}</span><br><span class="rv-a">${K('こたえ')}：${r.q.explain}</span></div>`; }).join('') : '';
   renderRankBoxes();
   if(stars>=2){ sfx.fanfare(); confetti(stars===3?120:50); }
 }
@@ -2275,13 +2305,26 @@ function renderBook(){
     wrap.insertAdjacentHTML('beforeend', `<div class="stk-h">${m.emo} ${m.name}</div>`);
     for(const g of m.grades){
       all++; const has = !!mem.stickers[g+'-'+id]; if(has) got++;
-      wrap.insertAdjacentHTML('beforeend', `<div class="sticker${has?'':' locked'}">${has?STICKER_EMO[id][g-1]:'❔'}<small>${g}ねん</small></div>`);
+      wrap.insertAdjacentHTML('beforeend', `<div class="sticker${has?'':' locked'}${G.newStickerKey===g+'-'+id&&G.bookBack==='result'?' new':''}">${has?STICKER_EMO[id][g-1]:'❔'}<small>${g}ねん</small></div>`);
     }
   });
   $('#book-count').textContent = `🏅 ${got} / ${all}`;
+  const nw=$('.sticker.new'); if(nw) setTimeout(()=>nw.scrollIntoView({block:'center',behavior:'smooth'}),100);
 }
 
-$('#btn-book').addEventListener('click', ()=>{ sfx.click(); go('book'); });
+$('#btn-book').addEventListener('click', ()=>{ sfx.click(); G.bookBack='title'; go('book'); });
+$('#btn-book-back').addEventListener('click', ()=>{ sfx.click(); const b=G.bookBack||'title'; G.bookBack=null; go(b); if(b==='result') setTimeout(updateScrollHint,50); });
+// 結果画面：下に つづきが ある ときは 知らせる
+function updateScrollHint(){
+  const sc=$('#res-scroll'), h=$('#scroll-hint'); if(!sc||!h) return;
+  const more = sc.scrollHeight - sc.clientHeight - sc.scrollTop > 24;
+  const act=$('.res-actions'); h.style.setProperty('--hint-bottom', (act?act.offsetHeight+10:120)+'px');
+  h.innerHTML = K('▼ したに つづきが あるよ');
+  h.classList.toggle('show', more && $('#s-result').classList.contains('active'));
+}
+$('#res-scroll').addEventListener('scroll', updateScrollHint, {passive:true});
+window.addEventListener('resize', updateScrollHint);
+$('#scroll-hint').addEventListener('click', ()=>{ const sc=$('#res-scroll'); sc.scrollBy({top:sc.clientHeight*0.7, behavior:'smooth'}); });
 $('#btn-history').addEventListener('click', ()=>{ sfx.click(); G.histFilter=0; go('history'); });
 $('#btn-reset').addEventListener('click', ()=>{ sfx.click();
   askConfirm('ほんとうに リセットしますか？<br><small>ほし・シール・ベスト・プレイかいすう・へいきんてん・まちがえた りれきが ぜんぶ きえて、もとに もどせません。</small>', ()=>{
